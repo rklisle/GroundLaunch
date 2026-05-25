@@ -1,0 +1,231 @@
+﻿<UserControl x:Class="GroundLunch.MissionMap"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GroundLunch"
+             mc:Ignorable="d" Height="1020" Width="1216">
+    <Grid Loaded="MainWindow_Loaded">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280" />
+            <ColumnDefinition Width="1640" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1000" />
+            <RowDefinition Height="20" />
+        </Grid.RowDefinitions>
+
+        <!-- 地图控件 -->
+        <esri:MapView 
+            x:Name="mapView"
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Grid.ColumnSpan="2" Margin="0,0,0,0" Width="1920"
+            />
+
+        <Grid Grid.Column="0">
+            <StackPanel x:Name="bigStack" Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Margin="0">
+                <!-- 小窗体 Overlay -->
+                <Grid HorizontalAlignment="Left" VerticalAlignment="Top" 
+  Margin="0" Width="280" Height="{Binding ElementName=mapView, Path=ActualHeight}"
+  Background="White" Opacity="0.95"
+  Panel.ZIndex="10" RenderTransformOrigin="0.421,0.452">
+                    <StackPanel Margin="10" Width="260">
+                        <Label Content="当前任务文件:"  FontSize="20" Margin="0,0,0,0"/>
+                        <Grid Width="150" Margin="0,0,0,5" Height="26">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="labelMsnFileName" Text="1.xml" FontSize="20" FontWeight="Bold" Margin="0,0,0,1"/>
+                            <Button x:Name="newMsn"  Grid.Column="1" Margin="0,0,0,0" Content="new"/>
+                        </Grid>
+                        <TextBlock x:Name="labelCurGroup" Text="当前编队" FontWeight="Bold"/>
+                        <ComboBox Name="comboSelectGroup" HorizontalAlignment="Center" Margin="0,5,0,0" Width="150" Height="24" SelectedIndex="0" FontSize="14" FontFamily="Microsoft YaHei UI Light" SelectionChanged="GroupComboBox_SelectionChanged">
+                            <ComboBoxItem>编队1</ComboBoxItem>
+                            <ComboBoxItem>编队2</ComboBoxItem>
+                            <ComboBoxItem>编队3</ComboBoxItem>
+                            <ComboBoxItem>编队4</ComboBoxItem>
+                            <ComboBoxItem>编队5</ComboBoxItem>
+                            <ComboBoxItem>编队6</ComboBoxItem>
+                            <ComboBoxItem>编队7</ComboBoxItem>
+                            <ComboBoxItem>编队8</ComboBoxItem>
+                            <ComboBoxItem>编队9</ComboBoxItem>
+                            <ComboBoxItem>编队10</ComboBoxItem>
+                            <ComboBoxItem>编队11</ComboBoxItem>
+                            <ComboBoxItem>编队12</ComboBoxItem>
+                        </ComboBox>
+
+
+                        <DataGrid Name="SelectGroupAirline" ItemsSource="{Binding}" Margin="0,10,0,0" Height="280" Width="240"  HeadersVisibility="Column" FontFamily="Microsoft YaHei Light" FontSize="13" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" CanUserSortColumns="False" CanUserAddRows="False" CanUserResizeColumns="True" AutoGenerateColumns="False" SelectionChanged="SelectGroupAirline_SelectionChanged" SelectionMode="Single" SelectionUnit="FullRow">
+                            <DataGrid.Style>
+                                <Style TargetType="DataGrid">
+                                    <Style.Resources>
+                                        <!-- 选中行的背景色 - 蓝色主题 -->
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF4A90E2"/>
+                                        <!-- 选中行的前景色 - 白色文字 -->
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/> 
+                                        <!-- 鼠标悬停时的背景色 - 浅蓝色 -->
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="White"/> 
+
+                                        <!-- 备用颜色方案 - 绿色主题 -->
+                                        <!--<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF2ECC71"/> -->
+                                        <!--<SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/> -->
+                                        <!--<SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FFE8F8F5"/> -->
+                                        
+                                        <!-- 非焦点状态下的选中行背景色 - 保持绿色 -->
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF4A90E2"/>
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White"/>
+
+                                        <!-- 备用颜色方案 - 橙色主题 -->
+                                        <!-- <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFE67E22"/> -->
+                                        <!-- <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/> -->
+                                        <!-- <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FFFDF2E9"/> -->
+                                        
+                                        <!-- 备用颜色方案 - 红色主题 -->
+                                        <!-- <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFE74C3C"/> -->
+                                        <!-- <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/> -->
+                                        <!-- <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FFFDF2F2"/> -->
+                                    </Style.Resources>
+                                </Style>
+                            </DataGrid.Style>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="序号" Binding="{Binding indexNumber}" Width="50" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="经度" Binding="{Binding longitude}" Width="60" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="纬度" Binding="{Binding latitude}" Width="60" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="高度" Binding="{Binding altitude}" Width="50" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="类型" Binding="{Binding type}" Width="50" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="航向" Binding="{Binding outTrack}" Width="50" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="速度" Binding="{Binding flightspeed}" Width="50" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="距离" Binding="{Binding segmentDistance}" Width="60" IsReadOnly="True"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <TextBlock Text="任务规划航点指定" FontSize="14" FontWeight="Bold" Margin="0,5,0,10" Height="17.78"/>
+                        
+                        <!-- 三行两列的按钮布局 -->
+                        <Grid Width="240" Margin="10,0,0,10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- 第一行 -->
+                            <Button x:Name="btnWaypoint" Content="飞行航点" FontSize="16" Width="70" Height="28" Grid.Row="0" Grid.Column="0" Margin="2,0,2,0" Click="NewWayPoint_Click"/>
+                            <Button Name="btnHover" Content="盘旋航点" FontSize="16" Width="70" Height="28" Grid.Row="0" Grid.Column="1" Margin="20,0,2,0" Click="NewHover_Click"/>
+                            
+                            <!-- 第二行 -->
+                            <Button Name="btnAttack" Content="攻击目标" FontSize="16" Width="70" Height="28" Grid.Row="1" Grid.Column="0" Margin="2,0,2,0" Click="NewAttack_Click"/>
+                            <Button Name="btnCancelAttack" Content="退出攻击" FontSize="16" Width="70" Height="28" Grid.Row="1" Grid.Column="1" Margin="20,0,2,0" Click="CancelAttack_Click"/>
+                            
+                            <!-- 第三行 -->
+                            <Button Name="btnGoHome" Content="返航" FontSize="16" Width="70" Height="28" Grid.Row="2" Grid.Column="0" Margin="2,0,2,0" Click="GoHome_Click"/>
+                            <Button Name="btnRecycle" Content="伞降" FontSize="16" Width="70" Height="28" Grid.Row="2" Grid.Column="1" Margin="20,0,2,0" Click="Recycle_Click"/>
+                        </Grid>
+                        <TextBlock Text="当前航点信息(可在地图选取)" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <Grid Width="200" Margin="0,0,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="66"/>
+                                <!-- Label 自适应宽度 -->
+                                <ColumnDefinition Width="*"/>
+                                <!-- TextBox 占满剩余空间 -->
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1*" />
+                                <RowDefinition Height="2*" />
+                                <RowDefinition Height="3*" />
+                                <RowDefinition Height="4*" />
+                                <RowDefinition Height="5*" />
+                                <RowDefinition Height="6*" />
+                            </Grid.RowDefinitions>
+                            <Label Content="经度：" Grid.Column="0" Grid.Row="0" Margin="0,0,0,1" FontFamily="Microsoft YaHei Light" FontSize="13"/>
+                            <TextBox Name="textLon" Text="" Grid.Column="1" Grid.Row="0" Height="23" FontSize="15" VerticalAlignment="Center" FontFamily="Microsoft YaHei Light" LostFocus="TextLon_LostFocus" TextChanged="TextLon_TextChanged"/>
+                            <Label Content="纬度：" Grid.Column="0" Grid.Row="1" Margin="0,0,0,1" FontFamily="Microsoft YaHei Light" FontSize="13" />
+                            <TextBox Name="textLat" Text="" VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Height="23" FontSize="15" FontFamily="Microsoft YaHei Light" LostFocus="TextLat_LostFocus" TextChanged="TextLat_TextChanged"/>
+                            <Label Content="高度：" Grid.Column="0"  Grid.Row="2" Margin="0,0,0,1" FontFamily="Microsoft YaHei Light" FontSize="13"/>
+                            <TextBox Name="textAlt" Text="1500" VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Height="23" FontSize="15" FontFamily="Microsoft YaHei Light"/>
+                            <Label Content="驶入航向：" Grid.Column="0"  Grid.Row="3" Margin="0,0,0,1" FontFamily="Microsoft YaHei Light" FontSize="13"/>
+                            <TextBox Name="textInTrack" Text="0" VerticalAlignment="Center" Grid.Column="1" Grid.Row="3" Height="23" FontSize="15" FontFamily="Microsoft YaHei Light"/>
+                            <Label Content="盘旋半径：" Grid.Column="0"  Grid.Row="4" Margin="0,0,0,1" FontFamily="Microsoft YaHei Light" FontSize="13"/>
+                            <TextBox Name="textRadius" Text="3500" VerticalAlignment="Center" Grid.Column="1" Grid.Row="4" Height="23" FontSize="15" FontFamily="Microsoft YaHei Light"/>
+                            <Label Content="航点速度：" Grid.Column="0"  Grid.Row="5" Margin="0,0,0,1" FontFamily="Microsoft YaHei Light" FontSize="13"/>
+                            <TextBox Name="textSpeed" Text="180" VerticalAlignment="Center" Grid.Column="1" Grid.Row="5" Height="23" FontSize="15" FontFamily="Microsoft YaHei Light"/>
+
+                        </Grid>
+                        
+                        <!-- 新增：航点修改确认按钮 -->
+                        <Button Name="btnConfirmChange" Content="确认修改" Width="77" Height="30" Margin="0,5,0,5" 
+                                Click="ConfirmWaypointChange_Click" FontSize="14" FontWeight="Bold" 
+                                Background="LightBlue" Foreground="DarkBlue"/>
+                        
+                        <TextBlock Name="cmdConfirm" Text="信息确认" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <Grid Width="200" Margin="0,0,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30" />
+                                <RowDefinition Height="30" />
+                            </Grid.RowDefinitions>
+                            <Button Grid.Column="0" Grid.Row="0" Name="btnSubmit" Content="加入规划" Margin="2,0,10,2" Click="SubmitMsn_Click" FontSize="14"/>
+                            <Button Grid.Column="1" Grid.Row="0" Name="btnCancel" Content="取消"  Margin="5,0,2,2" Click="CancelMsn_Click" FontSize="14"/>
+                            <Button Grid.Column="0" Grid.Row="1" Name="btnDel" Content="删除选中"  Margin="2,2,10,0" Click="DelMsn_Click" FontSize="14"/>
+                            <Button Grid.Column="1" Grid.Row="1" Name="btnUpdate" Content="更新航点"  Margin="5,2,2,0" Click="UpdateMsn_Click" FontSize="14"/>
+                        </Grid>
+                        <Grid Margin="8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="28"/>
+                                <RowDefinition Height="28"/>
+                                <RowDefinition Height="28"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="107"/>
+                                <ColumnDefinition Width="93"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 第一行 -->
+                            <Label Grid.Column="0" Content="仅携带战斗部:" VerticalAlignment="Center" Margin="0,0,5,0" Height="26" FontFamily="Microsoft YaHei Light" FontSize="13"/>
+                            <xctk:IntegerUpDown Name="textAttackCount" Grid.Row="0" Grid.Column="1" 
+                       Value="1" 
+                       Minimum="0" Maximum="12"
+                       Margin="0,1,45,1"/>
+
+                            <!-- 第二行 -->
+                            <Label Grid.Row="1" Grid.Column="0" Content="额外携带导引头:" VerticalAlignment="Center" Height="26" FontFamily="Microsoft YaHei Light" FontSize="13"/>
+                            <xctk:IntegerUpDown Name="textScoutCount" Grid.Row="1" Grid.Column="1" 
+                       Value="0" 
+                       Minimum="0" Maximum="12"
+                       Margin="0,1,45,1"/>
+
+                            <!-- 第三行 -->
+                            <Label Grid.Row="2" Grid.Column="0" Content="额外携带干扰:" VerticalAlignment="Center" Margin="0,0,10,0" Height="26" FontFamily="Microsoft YaHei Light" FontSize="13"/>
+                            <xctk:IntegerUpDown Name="textGanraoCount" Grid.Row="2" Grid.Column="1" 
+                       Value="0" 
+                       Minimum="0" Maximum="12"
+                       Margin="0,1,45,1"/>
+                        </Grid>
+
+
+                        <RadioButton Content="显示编队内飞机" Margin="0,0,0,0" FontFamily="Microsoft YaHei Light" FontSize="13"/>
+                        <RadioButton Content="显示所有编队主机" IsChecked="True" FontFamily="Microsoft YaHei Light" FontSize="13"/>
+
+                    </StackPanel>
+
+
+
+                </Grid>
+
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</UserControl>

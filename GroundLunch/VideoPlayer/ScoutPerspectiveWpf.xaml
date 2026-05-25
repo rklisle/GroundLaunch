@@ -1,0 +1,186 @@
+﻿<UserControl x:Class="GroundLunch.ScoutPerspectiveWpf"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:esri="http://schemas.esri.com/arcgis/runtime/2013"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GroundLunch"
+             mc:Ignorable="d" Height="1659" Width="2260">
+    <UserControl.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="5,0,5,0" />
+            <Setter Property="Height" Value="25" />
+            <Setter Property="Padding" Value="5,0,5,0" />
+        </Style>
+        <Style TargetType="Slider">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="5,0,5,0" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="200" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="60" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260" />
+            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="250" />
+        </Grid.ColumnDefinitions>
+
+        <!-- 三维跟随目标视角 -->
+        <esri:SceneView x:Name="CameraView" 
+                        Grid.Row="0"
+                        Grid.RowSpan="4"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="4"
+                        AtmosphereEffect="Realistic">
+        </esri:SceneView>
+        <!-- 摄像头正中的方框 -->
+        <Border 
+            Grid.Row="0"
+            Grid.RowSpan="4"
+            Grid.Column="0"
+            Grid.ColumnSpan="4"
+            Width="50"
+            Height="50"
+            BorderBrush="Red"
+            BorderThickness="3"
+            Background="#00FF0000"  
+         />
+        
+        <Line x:Name="CrosshairX" 
+                Grid.Row="0"
+                Grid.RowSpan="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Stroke="Red" 
+                StrokeThickness="3"
+                X1="470" Y1="472" X2="530" Y2="472"/>   
+        <Line x:Name="CrosshairY"
+                Grid.Row="0"
+                Grid.RowSpan="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Stroke="Red"
+                StrokeThickness="3"
+                X1="500" Y1="502" X2="500" Y2="442"/>
+        <!-- 右侧飞机姿态 -->
+        <Border Grid.Row="0"
+                Grid.RowSpan="2"
+                Grid.Column="3"
+                Margin="5"
+                CornerRadius="5">
+            <Border.Background>
+                <SolidColorBrush Opacity="0.6" Color="White" />
+            </Border.Background>
+            <StackPanel Margin="5">
+                <Label Content="Plane Posture" FontSize="32" />
+                <Separator />
+                
+                <Label Content="Heading:" FontSize="20"/>
+                <TextBlock x:Name="HeadingLabel" FontSize="16"/>
+                <Label Content="Pitch:" FontSize="20"/>
+                <TextBlock x:Name="PitchLabel" FontSize="16"/>
+                <Label Content="Roll:" FontSize="20"/>
+                <TextBlock x:Name="RollLabel" FontSize="16"/>
+            </StackPanel>
+        </Border>
+        <!-- 左侧飞机位置 -->
+        <Border Grid.Row="0"
+                Grid.RowSpan="2"
+            Grid.Column="0"
+            Margin="5"
+            CornerRadius="5">
+            <Border.Background>
+                <SolidColorBrush Opacity="0.6" Color="White" />
+            </Border.Background>
+            <StackPanel Margin="5">
+                <Label Content="Plane Position" FontSize="32" />
+                <Separator />
+                <Label Content="Longitude:" FontSize="20"/>
+                <TextBlock x:Name="LongitudeLabel" FontSize="16"/>
+                <Label Content="Latitude:" FontSize="20"/>
+                <TextBlock x:Name="LatitudeLabel" FontSize="16"/>
+                <Label Content="Altitude:" FontSize="20"/>
+                <TextBlock x:Name="AltitudeLabel" FontSize="16"/>
+            </StackPanel>
+        </Border>
+        <!-- 左侧中间导引头框架角 -->
+        <Border Grid.Row="0"
+                Grid.Column="1"
+                Margin="5"
+                CornerRadius="5">       
+            <Border.Background>
+                <SolidColorBrush Opacity="0.6" Color="White" />
+            </Border.Background>
+            <StackPanel Margin="5">
+                <Label Content="Scout Angle" FontSize="32" />
+                <Separator />
+                <Label Content="Pitch:" FontSize="20"/>
+                <TextBlock x:Name="ScoutPitchLabel" FontSize="16"/>
+                <Label Content="Heading:" FontSize="20"/>
+                <TextBlock x:Name="ScoutHeadingLabel" FontSize="16"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 右侧中间发动机参数 -->
+        <Border Grid.Row="0"
+        Grid.Column="2"
+        Margin="5"
+        CornerRadius="5">
+            <Border.Background>
+                <SolidColorBrush Opacity="0.6" Color="White" />
+            </Border.Background>
+            <StackPanel Margin="5">
+                <Label Content="Engine Stats" FontSize="32" />
+                <Separator />
+                <Label Content="Speed:" FontSize="20"/>
+                <TextBlock x:Name="SpeedLabel" FontSize="16"/>
+                <Label Content="Engine Rpm:" FontSize="20"/>
+                <TextBlock x:Name="RpmLabel" FontSize="16"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 下侧时间及编队参数 -->
+        <Border Grid.Row="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Margin="0"
+                CornerRadius="0">
+            <Border.Background>
+                <SolidColorBrush Opacity="0.6" Color="White" />
+            </Border.Background>
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <!-- 第1列：Label -->
+                    <ColumnDefinition Width="*"/>
+                    <!-- 第2列：TextBlock -->
+                    <ColumnDefinition Width="*"/>
+                    <!-- 第3列：Label -->
+                    <ColumnDefinition Width="*"/>
+                    <!-- 第4列：TextBlock -->
+                    <ColumnDefinition Width="*"/>
+                    <!-- 第1列：Label -->
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Content="Ignation Time:" FontSize="20" Grid.Column="0"/>
+                <TextBlock x:Name="TimeLabel" FontSize="20" Grid.Column="1" Margin="5,6,5,0" Text="0.000" />
+                <Label Content="MsnID:" FontSize="20" Grid.Column="2"/>
+                <TextBlock x:Name="MsnIDLabel" FontSize="20" Grid.Column="3" Margin="5,6,5,0"/>
+                <Label Content="LeadID:" FontSize="20" Grid.Column="4"/>
+                <TextBlock x:Name="LeadIDLabel" FontSize="20" Grid.Column="5" Margin="5,6,5,0"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
