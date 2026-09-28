@@ -1,4 +1,4 @@
-﻿using DevExpress.LookAndFeel;
+using DevExpress.LookAndFeel;
 using SharpGL;
 using SharpGL.SceneGraph;
 using System;

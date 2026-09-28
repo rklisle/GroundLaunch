@@ -1,4 +1,4 @@
-﻿using DevExpress.XtraCharts;
+using DevExpress.XtraCharts;
 using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraScheduler.Outlook.Native;
 //using DocumentFormat.OpenXml.Wordprocessing;
@@ -655,17 +655,17 @@ namespace GroundLunch
                 time = tMFramesByGroupID[i][0].second;
                 foreach (TMParam param in allParamList[i])
                 {
-                    if (param.paramID == "navLon" && param.paramDataPool == "imu")
+                    if (param.paramID == "navLon" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                     {
                         lon[i] = Convert.ToDouble(param.物理量);
                         continue;
                     }
-                    if (param.paramID == "navLat" && param.paramDataPool == "imu")
+                    if (param.paramID == "navLat" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                     {
                         lat[i] = Convert.ToDouble(param.物理量);
                         continue;
                     }
-                    if (param.paramID == "navHigh" && param.paramDataPool == "imu")
+                    if (param.paramID == "navHigh" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                     {
                         high[i] = Convert.ToDouble(param.物理量);
                         continue;
@@ -745,37 +745,63 @@ namespace GroundLunch
         }
         private void UpdateFrameToHDU()
         {
-            /*
-            double pitch = 0, dir=0, roll=0, high=0, speed = 0;
-            foreach (TMParam param in allParamList[NetDataHandle.curSelMsn])
+            double pitch = 0, dir = 0, roll = 0, high = 0, speed = 0;
+            double curAlt = 0, navHigh = 0;
+            bool gotCurAlt = false, gotNavHigh = false;
+            // TMPage 参数表按 0..5 存副本；界面当前网格固定用 index 0（curSelMsn 已废弃）
+            const int msn = 0;
+            if (!allParamList.ContainsKey(msn) || allParamList[msn] == null)
+                return;
+
+            foreach (TMParam param in allParamList[msn])
             {
-                if (param.paramID == "geoPitch" && param.paramDataPool == "flight")
+                if (param.paramID == "navPitch" && IsNavPool(param.paramDataPool))
                 {
                     pitch = Convert.ToDouble(param.物理量);
                     continue;
                 }
-                if (param.paramID == "imuDir" && param.paramDataPool == "imu")
+                if (param.paramID == "navDir" && IsNavPool(param.paramDataPool))
                 {
                     dir = Convert.ToDouble(param.物理量);
                     continue;
                 }
-                if (param.paramID == "geoRoll" && param.paramDataPool == "flight")
+                if (param.paramID == "navRoll" && IsNavPool(param.paramDataPool))
                 {
                     roll = Convert.ToDouble(param.物理量);
                     continue;
                 }
-                if (param.paramID == "navHigh" && param.paramDataPool == "imu")
+                if (param.paramID == "curAlt")
                 {
-                    high = Convert.ToDouble(param.物理量);
+                    curAlt = Convert.ToDouble(param.物理量);
+                    gotCurAlt = Math.Abs(curAlt) > 1e-6;
                     continue;
                 }
-                if (param.paramID == "AirSpd" )
+                if (param.paramID == "navHigh" && IsNavPool(param.paramDataPool))
+                {
+                    navHigh = Convert.ToDouble(param.物理量);
+                    gotNavHigh = Math.Abs(navHigh) > 1e-6;
+                    continue;
+                }
+                if (param.paramID == "AirSpd")
                 {
                     speed = Convert.ToDouble(param.物理量);
                     continue;
                 }
             }
-            tmhdu2.SetLocation(pitch, dir, roll, high, speed);  */
+
+            // 优先当前高度 curAlt，无效时回退导航高度
+            if (gotCurAlt)
+                high = curAlt;
+            else if (gotNavHigh)
+                high = navHigh;
+
+            tmhdu2.SetLocation(pitch, dir, roll, high, speed);
+        }
+
+        private static bool IsNavPool(string pool)
+        {
+            return string.Equals(pool, "nav", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(pool, "imu", StringComparison.OrdinalIgnoreCase);
         }
 
         private void UpdateFrameToGrid()

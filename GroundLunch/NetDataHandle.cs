@@ -1,4 +1,4 @@
-﻿using DevExpress.Utils;
+using DevExpress.Utils;
 using DevExpress.XtraPrinting.Native;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -36,6 +36,7 @@ namespace GroundLunch
         static public Dictionary<(int, int), List<CurFileInRocket> > planeFileList = new Dictionary<(int, int), List<CurFileInRocket>>();
         static public Dictionary<(int, int), int> planeConnectStatus = new Dictionary<(int, int), int>();
         static public Dictionary<(int, int), int> planeConnectDbm = new Dictionary<(int, int), int>();
+        // static public Dictionary<(int, int), int> tmAckCount = new Dictionary<(int, int), int>();
 
         static IAsyncResult asyncResult;
         static IAsyncResult asyncResultDataLink;
@@ -59,6 +60,7 @@ namespace GroundLunch
                     planeFileList[(i , j )] = new List<CurFileInRocket>();
                     planeConnectStatus[(i , j )] = 0;
                     planeConnectDbm[(i, j)] = -128;
+                    // tmAckCount[(i, j)] = 0;
                 }
             }
             TMHandler.InitTMHandler();
@@ -172,7 +174,8 @@ namespace GroundLunch
                         if (item.TerminalID == terminalID) 
                         {
                             item.TerminalOnline = 20;
-                            paoID++;
+                            // 必须用终端绑定的炮号，不能 paoID++（否则写入 (0,*) / 错炮，VideoForm 读不到）
+                            paoID = item.paoID;
                             break;
                         }
                     }
@@ -187,7 +190,8 @@ namespace GroundLunch
                             Send_To_DataLink(6, planeID);
                         }
                         sbyte dbm = (sbyte)buf[26 + i];
-                        planeConnectDbm[(paoID, guanID)] = dbm;
+                        if (paoID > 0)
+                            planeConnectDbm[(paoID, guanID)] = dbm;
                     }
                 }
                 if (buf[0] == 0x02 && buf[1] == 0xA0)
@@ -221,9 +225,11 @@ namespace GroundLunch
                                 if (id.Value.Item1 == planeDataLinkGroupID &&
                                    id.Value.Item2 == planeDataLinkPlaneID)
                                 {
+                                    // id.Key = (炮号, 管号)，同步到 VideoForm 读取的 planeConnectDbm
+                                    planeConnectDbm[id.Key] = dbm;
                                     foreach (var plane in item.planeDataLinks)
                                     {
-                                        if (plane.guanID == id.Key.Item1)
+                                        if (plane.guanID == id.Key.Item2)
                                         {//已经添加进列表，更新列表内容
                                             plane.dbm = dbm;
                                             item.needReInit = true;
@@ -339,33 +345,32 @@ namespace GroundLunch
                     // tmframes[(paoID, guanID)].Add((TMFrame)frame);
                     curSelPlaneTMFrame[(paoID, guanID)] = (TMFrame)frame;
                     TMHandler.FrameToAllParamList((TMFrame)frame, paoID, guanID);
+                    // 屏蔽：每 10 帧遥测向飞控发 0xFF 空应答
+                    // tmAckCount[(paoID, guanID)]++;
+                    // if (tmAckCount[(paoID, guanID)] >= 10)
+                    // {
+                    //     tmAckCount[(paoID, guanID)] = 0;
+                    //     Send_To_TM(paoID, guanID, 0, 0xFF, new byte[0]);
+                    // }
                 }
                 else
                 {
-                    //frame.AnalyzeFrame();
-                    commonframes[(paoID, guanID)].Add(frame);
-
-                    if (commonframes[(paoID, guanID)][0].msgID == 0x65)
+                    if (frame.msgID == 0x65)
                     {
-                        NetDataHandle.planeFileList[(paoID, guanID)].Add(commonframes[(paoID, guanID)][0].aFile);
+                        planeFileList[(paoID, guanID)].Add(frame.aFile);
                     }
-                    else if (commonframes[(paoID, guanID)][0].msgID == 0x30)
+                    else if (frame.msgID == 0x30)
                     {
-                        //发动机信息包，转发动机处理函数
-                        Buffer.BlockCopy(commonframes[(paoID, guanID)][0].payLoad, 0, _30Packet, 0, commonframes[(paoID, guanID)][0].dataLen);
+                        Buffer.BlockCopy(frame.payLoad, 0, _30Packet, 0, frame.dataLen);
                     }
-                    else if (commonframes[(paoID, guanID)][0].msgID == 0x31)
+                    else if (frame.msgID == 0x31)
                     {
-                        //发动机信息包，转发动机处理函数
-                        Buffer.BlockCopy(commonframes[(paoID, guanID)][0].payLoad, 0, _31Packet, 0, commonframes[(paoID, guanID)][0].dataLen);
+                        Buffer.BlockCopy(frame.payLoad, 0, _31Packet, 0, frame.dataLen);
                     }
-                    else if (commonframes[(paoID, guanID)][0].msgID == 0x32)
+                    else if (frame.msgID == 0x32)
                     {
-                        //发动机信息包，转发动机处理函数
-                        Buffer.BlockCopy(commonframes[(paoID, guanID)][0].payLoad, 0, _32Packet, 0, commonframes[(paoID, guanID)][0].dataLen);
+                        Buffer.BlockCopy(frame.payLoad, 0, _32Packet, 0, frame.dataLen);
                     }
-
-                    commonframes[(paoID, guanID)].RemoveAt(0);
                 }
                 /*202的东西，280用不到
                 //根据接收的IP地址判断，存入哪个rawBufList
@@ -476,6 +481,24 @@ namespace GroundLunch
             udpSendBuf[11] = (Byte)datalinkid[1];
             Buffer.BlockCopy(fcRecvData, 0, udpSendBuf, 12, len);//payload
             UdpPortSend(udpNode.udpClient, udpSendBuf, len + 12);
+        }
+
+        /// <summary>
+        /// 对时 CMD_BJTIME_SET(0x0A)：写入飞控 BJTimeSecond，供起飞时锁存到 luncTime。
+        /// 半实物无 GPS 时必须在起飞前调用，否则 luncTime 一直为 0。
+        /// </summary>
+        static public void SendBjTimeSet(int paoID, int guanID)
+        {
+            DateTime now = DateTime.Now;
+            byte[] data = new byte[9];
+            Buffer.BlockCopy(BitConverter.GetBytes((ushort)now.Year), 0, data, 0, 2);
+            data[2] = (byte)now.Month;
+            data[3] = (byte)now.Day;
+            data[4] = (byte)now.Hour;
+            data[5] = (byte)now.Minute;
+            data[6] = (byte)now.Second;
+            Buffer.BlockCopy(BitConverter.GetBytes((ushort)now.Millisecond), 0, data, 7, 2);
+            Send_To_TM(paoID, guanID, 9, 0x0A, data);
         }
 
         static public UInt32 datalinkPacketIndex = 0; 
@@ -625,7 +648,7 @@ namespace GroundLunch
                 }
                 catch
                 {
-                    MessageBox.Show("串口输出异常");
+                    ComSend.ShowSerialOutputError();
                 }
 
             }

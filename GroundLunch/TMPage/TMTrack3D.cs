@@ -1,4 +1,4 @@
-﻿using DevExpress.Skins;
+using DevExpress.Skins;
 using DevExpress.XtraGauges.Core.Base;
 using DocumentFormat.OpenXml.Drawing;
 using System;

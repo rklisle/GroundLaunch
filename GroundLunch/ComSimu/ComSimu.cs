@@ -1,4 +1,4 @@
-﻿using DevExpress.XtraEditors;
+using DevExpress.XtraEditors;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -43,13 +43,23 @@ namespace GroundLunch
 
         static public void StartReceiveUdpData()
         {
-            udpClient.Client.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 39701));
-            IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            IPAddress multicastAddress = IPAddress.Parse("238.0.0.1");
-            // udpNode.udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, 8001));
-            // 加入组播组
-            udpClient.JoinMulticastGroup(multicastAddress, IPAddress.Parse("127.0.0.1"));
-            udpClient.BeginReceive(new AsyncCallback(OnRecviceUdpData), (udpClient, remoteEndPoint));
+            try
+            {
+                udpClient.Client.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 39701));
+                IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                IPAddress multicastAddress = IPAddress.Parse("238.0.0.1");
+                // udpNode.udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, 8001));
+                // 加入组播组
+                udpClient.JoinMulticastGroup(multicastAddress, IPAddress.Parse("127.0.0.1"));
+                udpClient.BeginReceive(new AsyncCallback(OnRecviceUdpData), (udpClient, remoteEndPoint));
+            }
+            catch (SocketException)
+            {
+                // 39701 已被占用（常见于 Debug 实例还在跑）时不要让整个地面站退出
+            }
+            catch (Exception)
+            {
+            }
         }
 
         static public void OnRecviceUdpData(IAsyncResult ar)

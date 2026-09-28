@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -155,6 +155,11 @@ namespace GroundLunch
                     {
                         NetDataHandle.Send_To_DataLink(0, item.TerminalID, 1);
                     }
+                    // 起飞前对时，否则 DoIgnition 锁存的 luncTime 为 0
+                    if (NetDataHandle.curPao > 0 && NetDataHandle.curGuan > 0)
+                        NetDataHandle.SendBjTimeSet(NetDataHandle.curPao, NetDataHandle.curGuan);
+                    else
+                        NetDataHandle.SendBjTimeSet(1, 1);
                     
                 }
                 catch (Exception)

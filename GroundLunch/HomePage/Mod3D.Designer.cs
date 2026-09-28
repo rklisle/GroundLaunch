@@ -1,4 +1,4 @@
-﻿namespace GroundLunch
+namespace GroundLunch
 {
     partial class Mod3D
     {

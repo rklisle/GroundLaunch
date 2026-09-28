@@ -1,4 +1,4 @@
-﻿using DevExpress.Charts.Native;
+using DevExpress.Charts.Native;
 using DevExpress.Utils.Extensions;
 using DevExpress.XtraCharts;
 using Newtonsoft.Json;

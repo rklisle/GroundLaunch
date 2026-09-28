@@ -1,4 +1,4 @@
-﻿using Esri.ArcGISRuntime.Geometry;
+using Esri.ArcGISRuntime.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -983,7 +983,7 @@ namespace GroundLunch
                         newWp.wpType = 3;
                         break;
                     case MSN_MODE.MSN_RECYCLE_SELECTED:
-                        newWp.wpType = 5;
+                        newWp.wpType = 6;
                         break;
                     case MSN_MODE.MSN_HOVER_RADIUS_CONFIRMED:
                         newWp.wpType = 2;
@@ -1174,7 +1174,7 @@ namespace GroundLunch
                 case 3: // 攻击目标
                     EnableTargetWaypointInfo(true);
                     break;
-                case 5: // 伞降点
+                case 6: // 回收点
                     EnableRecycleWaypointInfo(true);
                     break;
             }
@@ -1236,7 +1236,7 @@ namespace GroundLunch
                                     textSpeed.Text = "0";
                                     break;
                                     
-                                case 5: // 伞降点
+                                case 6: // 回收点
                                     EnableRecycleWaypointInfo(true);
                                     textLon.Text = waypointInfo.Lon.ToString("F8");
                                     textLat.Text = waypointInfo.Lat.ToString("F8");

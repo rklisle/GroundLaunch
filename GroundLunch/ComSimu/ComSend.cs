@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
@@ -48,6 +48,17 @@ namespace GroundLunch
             SerialPortSend(comSetting.nodes[0].serialPort, buf, len);
         }
 
+        static int serialErrorPopupCount = 0;
+        const int serialErrorPopupMax = 10;
+
+        static public void ShowSerialOutputError()
+        {
+            if (serialErrorPopupCount >= serialErrorPopupMax)
+                return;
+            serialErrorPopupCount++;
+            MessageBox.Show("串口输出异常");
+        }
+
         static public void SerialPortSend(SerialPort port, Byte[] buf, int len)
         {
             if (port != null && port.IsOpen == true)
@@ -58,7 +69,7 @@ namespace GroundLunch
                 }
                 catch
                 {
-                    MessageBox.Show("串口输出异常");
+                    ShowSerialOutputError();
                 }
 
             }

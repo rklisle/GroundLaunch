@@ -1,4 +1,4 @@
-﻿using DevExpress.Utils;
+using DevExpress.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -75,19 +75,19 @@ namespace GroundLunch
                     {
                         spd = Convert.ToDouble(param.物理量);
                     }
-                    if (param.paramID == "navLon" && param.paramDataPool == "imu")
+                    if (param.paramID == "curLon" && param.paramDataPool == "flight")
                     {
                         lon = Convert.ToDouble(param.物理量);
                     }
-                    if (param.paramID == "navLat" && param.paramDataPool == "imu")
+                    if (param.paramID == "curLat" && param.paramDataPool == "flight")
                     {
                         lat = Convert.ToDouble(param.物理量);
                     }
-                    if (param.paramID == "navHigh" && param.paramDataPool == "imu")
+                    if (param.paramID == "navHigh" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                     {
                         alt = Convert.ToDouble(param.物理量);
                     }
-                    if (param.paramID == "navDir" && param.paramDataPool == "imu")
+                    if (param.paramID == "navDir" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                     {
                         dir = Convert.ToDouble(param.物理量);
                     }
@@ -100,6 +100,9 @@ namespace GroundLunch
                 if (groupid != 0 && groupid != 0xff)
                 {
                     DataInterface.startFly = startFly == 1 ? true : false;
+                    // System.IO.File.AppendAllText(System.AppDomain.CurrentDomain.BaseDirectory + "轨迹调试.log",
+                    //     string.Format("[{0}] OnTimerFresh grp={1} msn={2} lon={3} lat={4}\r\n",
+                    //     DateTime.Now.ToString("HH:mm:ss.fff"), groupid, msnid, lon, lat));
                     DataInterface.UVEs[(groupid, msnid)].uveEnable = 1;
                     DataInterface.UVEs[(groupid, msnid)].curInfo.wGS84Pos.lon = lon;
                     DataInterface.UVEs[(groupid, msnid)].curInfo.wGS84Pos.lat = lat;

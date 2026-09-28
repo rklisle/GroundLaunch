@@ -1,4 +1,4 @@
-﻿using GMap.NET.WindowsForms;
+using GMap.NET.WindowsForms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

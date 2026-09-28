@@ -1,4 +1,4 @@
-﻿using DevExpress.XtraCharts;
+using DevExpress.XtraCharts;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -40,51 +40,37 @@ namespace GroundLunch
         private void btSetAll_Click(object sender, EventArgs e)
         {
             Byte[] data = new Byte[14];
-            short srv1 = (short)(((double)spin1MM.Value) * 100);
-            short srv2 = (short)(((double)spin2MM.Value) * 100);
-            short srv3 = (short)(((double)spin3MM.Value) * 100);
-            short srv4 = (short)(((double)spin4MM.Value) * 100);
-            short srv5 = (short)(((double)spin5MM.Value) * 100);
-            short srv6 = (short)(((double)spin6MM.Value) * 100);
-            Byte[] temp = new Byte[2];
-            temp = BitConverter.GetBytes(srv1);
-            Buffer.BlockCopy(temp, 0, data, 0, 2);
-            temp = BitConverter.GetBytes(srv2);
-            Buffer.BlockCopy(temp, 0, data, 2, 2);
-            temp = BitConverter.GetBytes(srv3);
-            Buffer.BlockCopy(temp, 0, data, 4, 2);
-            temp = BitConverter.GetBytes(srv4);
-            Buffer.BlockCopy(temp, 0, data, 6, 2);
-            temp = BitConverter.GetBytes(srv5);
-            Buffer.BlockCopy(temp, 0, data, 8, 2);
-            temp = BitConverter.GetBytes(srv6);
-            Buffer.BlockCopy(temp, 0, data, 10, 2);
-            NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan, 12, 0x42, data);
+            short[] srv = new short[7];
+            srv[0] = (short)(((double)spin1MM.Value) * 100);
+            srv[1] = (short)(((double)spin2MM.Value) * 100);
+            srv[2] = (short)(((double)spin3MM.Value) * 100);
+            srv[3] = (short)(((double)spin4MM.Value) * 100);
+            srv[4] = (short)(((double)spin5MM.Value) * 100);
+            srv[5] = (short)(((double)spin6MM.Value) * 100);
+            srv[6] = (short)(((double)spin7MM.Value) * 100);
+            for (int i = 0; i < srv.Length; i++)
+            {
+                Buffer.BlockCopy(BitConverter.GetBytes(srv[i]), 0, data, i * 2, 2);
+            }
+            NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan, 14, 0x42, data);
         }
 
         private void btSetSrvZero_Click(object sender, EventArgs e)
         {
             Byte[] data = new Byte[14];
-            short srv1 = (short)(((double)spin1MM.Value) * 100);
-            short srv2 = (short)(((double)spin2MM.Value) * 100);
-            short srv3 = (short)(((double)spin3MM.Value) * 100);
-            short srv4 = (short)(((double)spin4MM.Value) * 100);
-            short srv5 = (short)(((double)spin5MM.Value) * 100);
-            short srv6 = (short)(((double)spin6MM.Value) * 100);
-            Byte[] temp = new Byte[2];
-            temp = BitConverter.GetBytes(srv1);
-            Buffer.BlockCopy(temp, 0, data, 0, 2);
-            temp = BitConverter.GetBytes(srv2);
-            Buffer.BlockCopy(temp, 0, data, 2, 2);
-            temp = BitConverter.GetBytes(srv3);
-            Buffer.BlockCopy(temp, 0, data, 4, 2);
-            temp = BitConverter.GetBytes(srv4);
-            Buffer.BlockCopy(temp, 0, data, 6, 2);
-            temp = BitConverter.GetBytes(srv5);
-            Buffer.BlockCopy(temp, 0, data, 8, 2);
-            temp = BitConverter.GetBytes(srv6);
-            Buffer.BlockCopy(temp, 0, data, 10, 2);
-            NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan, 12, 0x48, data);
+            short[] srv = new short[7];
+            srv[0] = (short)(((double)spin1MM.Value) * 100);
+            srv[1] = (short)(((double)spin2MM.Value) * 100);
+            srv[2] = (short)(((double)spin3MM.Value) * 100);
+            srv[3] = (short)(((double)spin4MM.Value) * 100);
+            srv[4] = (short)(((double)spin5MM.Value) * 100);
+            srv[5] = (short)(((double)spin6MM.Value) * 100);
+            srv[6] = (short)(((double)spin7MM.Value) * 100);
+            for (int i = 0; i < srv.Length; i++)
+            {
+                Buffer.BlockCopy(BitConverter.GetBytes(srv[i]), 0, data, i * 2, 2);
+            }
+            NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan, 14, 0x48, data);
         }
 
         private void SrvTestPage_Load(object sender, EventArgs e)
@@ -553,22 +539,13 @@ namespace GroundLunch
                     textInfoStatus.Text = "启动中";
                     break;
                 case 2:
-                    textInfoStatus.Text = "停机中";
+                    textInfoStatus.Text = "散热";
                     break;
                 case 3:
                     textInfoStatus.Text = "故障";
                     break;
-                case 4:
-                    textInfoStatus.Text = "脱机";
-                    break;
                 case 5:
                     textInfoStatus.Text = "运行";
-                    break;
-                case 6:
-                    textInfoStatus.Text = "重启";
-                    break;
-                case 7:
-                    textInfoStatus.Text = "测试";
                     break;
                 default:
                     textInfoStatus.Text = running_info.runningStatus.ToString();
@@ -578,44 +555,11 @@ namespace GroundLunch
             switch (running_info.error)
             {
                 case 0:
-                    textInfoError.Text = "GSU断开";
+                    textInfoError.Text = "无异常";
                     break;
                 case 1:
-                    textInfoError.Text = "正常运行";
-                    break;
-                case 2:
-                    textInfoError.Text = "点火头故障";
-                    break;
-                case 3:
-                    textInfoError.Text = "转子故障";
-                    break;
-                case 4:
-                    textInfoError.Text = "启动超时";
-                    break;
-                case 5:
-                    textInfoError.Text = "熄火重启";
-                    break;
-                case 6:
-                    textInfoError.Text = "温度故障";
-                    break;
-                case 7:
-                    textInfoError.Text = "转速丢失";
-                    break;
-                case 8:
-                    textInfoError.Text = "点火不成功";
-                    break;
-                case 9:
-                    textInfoError.Text = "遥控丢失";
-                    break;
-                case 10:
-                    textInfoError.Text = "到达寿命";
-                    break;
-                case 11:
-                    textInfoError.Text = "电池电压低";
-                    break;
-                case 12:
-                    textInfoError.Text = "232通信断开";
-                    break;
+                    textInfoError.Text = "启动失败";
+                    break;                               
             }
             textInfoID.Text = running_info.id.ToString();
             textInfoSetRpm.Text = running_info.settingRpm.ToString();

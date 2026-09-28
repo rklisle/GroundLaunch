@@ -1,4 +1,4 @@
-﻿using DevExpress.Utils.Svg;
+using DevExpress.Utils.Svg;
 using DevExpress.XtraEditors;
 using System;
 using System.Collections.Generic;
@@ -65,6 +65,8 @@ namespace GroundLunch
                 }
                 double v = 0, a = 0, rpm = 0, groupid = 0, msnid = 0, pitch = 0;
                 double lon = 0, lat = 0, alt = 0, roll = 0, yaw = 0;
+                double curLonVal = 0, curLatVal = 0, curAltVal = 0;
+                bool gotNavLon = false, gotNavLat = false, gotNavAlt = false;
                 int curStep = 0, luanchRecv = 0, startFly = 0, payloadtp = 0, guaID = 0, scCnt = 0, navState = 0, engState = 0;
                 foreach (TMParam param in TMHandler.allParamList[(paoID, guanID)])
                 {
@@ -88,7 +90,8 @@ namespace GroundLunch
                     {
                         rpm = Convert.ToDouble(param.物理量);
                     }
-                    if (param.paramID == "navPitch" && param.paramDataPool == "imu")
+                    // 遥测表 nav* 在 200hz、来源为 nav；旧表/部分写入仍可能是 imu。控制包 cur* 作回退。
+                    if (param.paramID == "navPitch" && IsNavAttitudePool(param.paramDataPool))
                     {
                         pitch = Convert.ToDouble(param.物理量);
                     }
@@ -104,23 +107,38 @@ namespace GroundLunch
                     {
                         startFly = Convert.ToInt32(param.物理量);
                     }
-                    if (param.paramID == "navLon" && param.paramDataPool == "imu")
+                    if (param.paramID == "navLon" && IsNavAttitudePool(param.paramDataPool))
                     {
                         lon = Convert.ToDouble(param.物理量);
+                        gotNavLon = Math.Abs(lon) > 1e-6;
                     }
-                    if (param.paramID == "navLat" && param.paramDataPool == "imu")
+                    if (param.paramID == "navLat" && IsNavAttitudePool(param.paramDataPool))
                     {
                         lat = Convert.ToDouble(param.物理量);
+                        gotNavLat = Math.Abs(lat) > 1e-6;
                     }
-                    if (param.paramID == "navHigh" && param.paramDataPool == "imu")
+                    if (param.paramID == "navHigh" && IsNavAttitudePool(param.paramDataPool))
                     {
                         alt = Convert.ToDouble(param.物理量);
+                        gotNavAlt = Math.Abs(alt) > 1e-6;
                     }
-                    if (param.paramID == "navRoll" && param.paramDataPool == "imu")
+                    if (param.paramID == "curLon")
+                    {
+                        curLonVal = Convert.ToDouble(param.物理量);
+                    }
+                    if (param.paramID == "curLat")
+                    {
+                        curLatVal = Convert.ToDouble(param.物理量);
+                    }
+                    if (param.paramID == "curAlt")
+                    {
+                        curAltVal = Convert.ToDouble(param.物理量);
+                    }
+                    if (param.paramID == "navRoll" && IsNavAttitudePool(param.paramDataPool))
                     {
                         roll = Convert.ToDouble(param.物理量);
                     }
-                    if (param.paramID == "navDir" && param.paramDataPool == "imu")
+                    if (param.paramID == "navDir" && IsNavAttitudePool(param.paramDataPool))
                     {
                         yaw = Convert.ToDouble(param.物理量);
                     }
@@ -132,11 +150,11 @@ namespace GroundLunch
                     {
                         guaID = Convert.ToInt32(param.物理量);
                     }
-                    if (param.paramID == "gpsScCnt")
+                    if (param.paramID == "gpsScCnt" || param.paramID == "gpsLoCnt")
                     {
                         scCnt = Convert.ToInt32(param.物理量);
                     }
-                    if (param.paramID == "navState" && param.paramDataPool == "imu")
+                    if (param.paramID == "navState" && IsNavAttitudePool(param.paramDataPool))
                     {
                         navState = Convert.ToInt32(param.物理量);
                     }
@@ -145,6 +163,10 @@ namespace GroundLunch
                         engState = Convert.ToInt32(param.物理量);
                     }
                 }
+
+                if (!gotNavLon) lon = curLonVal;
+                if (!gotNavLat) lat = curLatVal;
+                if (!gotNavAlt) alt = curAltVal;
 
                 Color labelColor = Color.White;
                 if (step != curStep)
@@ -280,6 +302,13 @@ namespace GroundLunch
         {
             NetDataHandle.curPao = paoID;
             NetDataHandle.curGuan = guanID;
+        }
+
+        /// <summary>导航姿态/位置在遥测表中来源为 nav；历史表或 MEMS 写入侧可能标为 imu。</summary>
+        private static bool IsNavAttitudePool(string pool)
+        {
+            return string.Equals(pool, "nav", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(pool, "imu", StringComparison.OrdinalIgnoreCase);
         }
 
         private void picPlane_Click(object sender, EventArgs e)

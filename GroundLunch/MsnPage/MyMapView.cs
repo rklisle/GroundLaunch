@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -31,6 +31,8 @@ namespace GroundLunch
         private List<PolylineBuilder> _polylineBuilder = new List<PolylineBuilder>();
         private List<Graphic> _planeGraphics = new List<Graphic>();
         private List<SimpleMarkerSymbol> _trianglePlaneSymbol = new List<SimpleMarkerSymbol>();
+        private Dictionary<(int, int), int> _planeGraphicIndex = new Dictionary<(int, int), int>();
+        private Dictionary<(int, int), int> _polylineIndex = new Dictionary<(int, int), int>();
 
         private GraphicsOverlay missionOverlay = new GraphicsOverlay();
 
@@ -858,7 +860,7 @@ namespace GroundLunch
                     target.high = pt.alt;
                     waypointInfo = target;
                 }
-                else if (pt.wpType == 5) // 伞降点
+                else if (pt.wpType == 6) // 回收点
                 {
                     var recycle = new RecycleInfo();
                     recycle.lon = pt.lon;
@@ -953,7 +955,7 @@ namespace GroundLunch
                     tempWayPointsOverlay.Graphics.Add(target.targetGraphic);
                     tempWayPointsOverlay.LabelDefinitions.Add(target.labelDefinition);
                 }
-                else if (pt.wpType == 5) // 伞降点
+                else if (pt.wpType == 6) // 回收点
                 {
                     RecycleInfo recyclept = new RecycleInfo();
                     recyclept.lon = pt.lon;
@@ -1001,6 +1003,7 @@ namespace GroundLunch
                     DataInterface.luanchInfo.wGS84Pos.lat, SpatialReferences.Wgs84), triangleSymbol);
                 planeGraphic.Attributes["Name"] = String.Format("{0}", uve.Value.uveName);
                 planeGraphic.Attributes["Description"] = "不知道1";
+                _planeGraphicIndex[(uve.Value.uveGroupID, uve.Value.uveMsnID)] = _planeGraphics.Count;
                 _planeGraphics.Add(planeGraphic);
                 graphicsOverlay.Graphics.Add(planeGraphic);
             }
@@ -1130,7 +1133,7 @@ namespace GroundLunch
                     target.high = pt.alt;
                     waypointInfo = target;
                 }
-                else if (pt.wpType == 5) // 伞降点
+                else if (pt.wpType == 6) // 回收点
                 {
                     var recycle = new RecycleInfo();
                     recycle.lon = pt.lon;
@@ -1286,6 +1289,7 @@ namespace GroundLunch
                 var polylineGraphic = new Graphic(dynamicPolyline, lineSymbol);
                 var graphicsOverlay = new GraphicsOverlay();
                 graphicsOverlay.Graphics.Add(polylineGraphic);
+                _polylineIndex[(uve.Value.uveGroupID, uve.Value.uveMsnID)] = _polylineGraphics.Count;
                 _polylineBuilder.Add(polylineBuilder);
                 _polylineGraphics.Add(polylineGraphic);
                 Control.GraphicsOverlays?.Add(graphicsOverlay);
@@ -1299,26 +1303,28 @@ namespace GroundLunch
 
         private void AddPointToDynamicCurve()
         {
-            // 模拟新点（实际情况应为获取新的坐标）
-            // double longitude = -118.2851 + (dynamicPoints.Count * 0.0001); // 假设每次添加 0.0001 经度
-            //double latitude = 34.0219 + (dynamicPoints.Count * 0.0001);  // 假设每次添加 0.0001 纬度
-            // 创建新点并添加到列表
-            int i = 0;
             foreach (var uve in DataInterface.UVEs)
             {
                 if (uve.Value.uveEnable == 0)
                     continue;
                 if (uve.Value.curInfo.wGS84Pos.lon == 0)
                     continue;
+                // System.IO.File.AppendAllText(System.AppDomain.CurrentDomain.BaseDirectory + "轨迹调试.log",
+                //     string.Format("[{0}] AddPoint uve=({1},{2}) en={3} lon={4} lat={5}\r\n",
+                //     DateTime.Now.ToString("HH:mm:ss.fff"), uve.Value.uveGroupID, uve.Value.uveMsnID,
+                //     uve.Value.uveEnable, uve.Value.curInfo.wGS84Pos.lon, uve.Value.curInfo.wGS84Pos.lat));
+                if (!_planeGraphicIndex.TryGetValue((uve.Value.uveGroupID, uve.Value.uveMsnID), out int idx))
+                    continue;
                 var newPoint = new MapPoint(uve.Value.curInfo.wGS84Pos.lon,
                     uve.Value.curInfo.wGS84Pos.lat, SpatialReferences.Wgs84);
-                _polylineBuilder[i]?.AddPoint(newPoint);
-
-                _polylineGraphics[i].Geometry = _polylineBuilder[i].ToGeometry();
-
-                _planeGraphics[i].Geometry = newPoint;
-                _trianglePlaneSymbol[i].Angle = uve.Value.curInfo.dir;
-                i++;
+                if (idx < _polylineBuilder.Count && _polylineBuilder[idx] != null)
+                    _polylineBuilder[idx].AddPoint(newPoint);
+                if (idx < _polylineGraphics.Count && _polylineGraphics[idx] != null && _polylineBuilder[idx] != null)
+                    _polylineGraphics[idx].Geometry = _polylineBuilder[idx].ToGeometry();
+                if (idx < _planeGraphics.Count && _planeGraphics[idx] != null)
+                    _planeGraphics[idx].Geometry = newPoint;
+                if (idx < _trianglePlaneSymbol.Count && _trianglePlaneSymbol[idx] != null)
+                    _trianglePlaneSymbol[idx].Angle = uve.Value.curInfo.dir;
             }
         }
     }
@@ -1561,7 +1567,7 @@ namespace GroundLunch
         public double Lon { get => lon; set => lon = value; }
         public double Lat { get => lat; set => lat = value; }
         public double Alt { get => high; set => high = value; }
-        public int WpType => 5; // 伞降点
+        public int WpType => 6; // 回收点
 
         public RecycleInfo()
         {

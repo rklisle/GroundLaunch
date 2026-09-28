@@ -1,4 +1,4 @@
-﻿namespace GroundLunch
+namespace GroundLunch
 {
     partial class LuanchPage
     {
@@ -161,7 +161,7 @@
             this.labelControl3.Name = "labelControl3";
             this.labelControl3.Size = new System.Drawing.Size(421, 41);
             this.labelControl3.TabIndex = 11;
-            this.labelControl3.Text = "ZT280-Y1 巡飞发控系统";
+            this.labelControl3.Text = "PJ150-Y1 巡飞发控系统";
             // 
             // panelControl
             // 

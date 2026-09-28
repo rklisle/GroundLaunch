@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\OpenCvSharp4.runtime.win.4.11.0.20250507\build\netstandard\OpenCvSharp4.runtime.win.props" Condition="Exists('..\packages\OpenCvSharp4.runtime.win.4.11.0.20250507\build\netstandard\OpenCvSharp4.runtime.win.props')" />
   <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
@@ -38,6 +38,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -539,4 +540,19 @@
   <Import Project="..\packages\Esri.ArcGISRuntime.200.7.0\build\net472\Esri.ArcGISRuntime.targets" Condition="Exists('..\packages\Esri.ArcGISRuntime.200.7.0\build\net472\Esri.ArcGISRuntime.targets')" />
   <Import Project="..\packages\Esri.ArcGISRuntime.WPF.200.7.0\build\net472\Esri.ArcGISRuntime.WPF.targets" Condition="Exists('..\packages\Esri.ArcGISRuntime.WPF.200.7.0\build\net472\Esri.ArcGISRuntime.WPF.targets')" />
   <Import Project="..\packages\MaterialDesignThemes.5.2.1\build\MaterialDesignThemes.targets" Condition="Exists('..\packages\MaterialDesignThemes.5.2.1\build\MaterialDesignThemes.targets')" />
+  <!-- Debug 目录是实际运行资源所在处；Release/x64 构建后自动拷入，避免缺 flashFile 等启动即崩 -->
+  <Target Name="CopyRuntimeWorkingDirs" AfterTargets="Build" Condition="'$(Configuration)' != 'Debug' Or '$(Platform)' != 'AnyCPU'">
+    <ItemGroup>
+      <_RuntimeFlash Include="$(ProjectDir)bin\Debug\flashFile\**\*.*" Condition="Exists('$(ProjectDir)bin\Debug\flashFile')" />
+      <_RuntimeConfig Include="$(ProjectDir)bin\Debug\Config\**\*.*" Condition="Exists('$(ProjectDir)bin\Debug\Config')" />
+      <_RuntimeFFmpeg Include="$(ProjectDir)bin\Debug\FFmpeg\**\*.*" Condition="Exists('$(ProjectDir)bin\Debug\FFmpeg')" />
+      <_RuntimePic Include="$(ProjectDir)bin\Debug\pic\**\*.*" Condition="Exists('$(ProjectDir)bin\Debug\pic')" />
+      <_RuntimeMsn Include="$(ProjectDir)bin\Debug\Msn\**\*.*" Condition="Exists('$(ProjectDir)bin\Debug\Msn')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_RuntimeFlash)" DestinationFiles="@(_RuntimeFlash->'$(OutDir)flashFile\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_RuntimeConfig)" DestinationFiles="@(_RuntimeConfig->'$(OutDir)Config\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_RuntimeFFmpeg)" DestinationFiles="@(_RuntimeFFmpeg->'$(OutDir)FFmpeg\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_RuntimePic)" DestinationFiles="@(_RuntimePic->'$(OutDir)pic\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_RuntimeMsn)" DestinationFiles="@(_RuntimeMsn->'$(OutDir)Msn\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

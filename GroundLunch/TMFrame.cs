@@ -1,4 +1,4 @@
-﻿using DevExpress.Internal.WinApi.Windows.UI.Notifications;
+using DevExpress.Internal.WinApi.Windows.UI.Notifications;
 using DevExpress.XtraScheduler.Drawing;
 using OfficeOpenXml;
 using Org.BouncyCastle.Bcpg;
@@ -215,6 +215,10 @@ namespace GroundLunch
                         param.paramDataPool = sheet.Cells[i, 7].Value.ToString();
                     else
                         param.paramDataPool = "";
+                    // HIL 仿真时组合导航位置(经纬度)在 IMU 池（modHil 注入仿真器位置），NAV 池为导航解算(仿真时=0)
+                    // 故强制按 IMU 池读取，保证轨迹同步；真实飞行时 IMU 池 navLon 亦为导航 CPU 位置
+                    if (param.paramID == "navLon" || param.paramID == "navLat")
+                        param.paramDataPool = "imu";
                     param.fomula = sheet.Cells[i, 8].Value.ToString();
                     if (sheet.Cells[i, 9].Value != null)
                         param.detail = sheet.Cells[i, 9].Value.ToString();

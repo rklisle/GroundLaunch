@@ -1,4 +1,4 @@
-﻿namespace GroundLunch
+namespace GroundLunch
 {
     partial class VideoForm
     {
@@ -47,11 +47,15 @@
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
             this.scoutPerspectiveWpf3 = new GroundLunch.ScoutPerspectiveWpf();
             this.xtraTabPage2 = new DevExpress.XtraTab.XtraTabPage();
-            this.radioInnerImage = new System.Windows.Forms.RadioButton();
             this.radioLowlight = new System.Windows.Forms.RadioButton();
             this.radioTV = new System.Windows.Forms.RadioButton();
             this.bookstatelab = new DevExpress.XtraEditors.LabelControl();
             this.checkAutoSendByClick = new DevExpress.XtraEditors.CheckEdit();
+            this.btCancelTrack = new DevExpress.XtraEditors.SimpleButton();
+            this.labelGateWidth = new DevExpress.XtraEditors.LabelControl();
+            this.textGateWidth = new DevExpress.XtraEditors.TextEdit();
+            this.labelGateHeight = new DevExpress.XtraEditors.LabelControl();
+            this.textGateHeight = new DevExpress.XtraEditors.TextEdit();
             this.btLockTarget = new DevExpress.XtraEditors.SimpleButton();
             this.textPointY = new DevExpress.XtraEditors.TextEdit();
             this.textPointX = new DevExpress.XtraEditors.TextEdit();
@@ -82,6 +86,8 @@
             this.xtraTabPage1.SuspendLayout();
             this.xtraTabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.checkAutoSendByClick.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.textGateWidth.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.textGateHeight.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.textPointY.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.textPointX.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.buttonEdit2.Properties)).BeginInit();
@@ -125,12 +131,16 @@
             // 
             // xtraTabPage2
             // 
-            this.xtraTabPage2.Controls.Add(this.radioInnerImage);
             this.xtraTabPage2.Controls.Add(this.radioLowlight);
             this.xtraTabPage2.Controls.Add(this.radioTV);
             this.xtraTabPage2.Controls.Add(this.bookstatelab);
+            this.xtraTabPage2.Controls.Add(this.btCancelTrack);
             this.xtraTabPage2.Controls.Add(this.checkAutoSendByClick);
             this.xtraTabPage2.Controls.Add(this.btLockTarget);
+            this.xtraTabPage2.Controls.Add(this.textGateHeight);
+            this.xtraTabPage2.Controls.Add(this.textGateWidth);
+            this.xtraTabPage2.Controls.Add(this.labelGateHeight);
+            this.xtraTabPage2.Controls.Add(this.labelGateWidth);
             this.xtraTabPage2.Controls.Add(this.textPointY);
             this.xtraTabPage2.Controls.Add(this.textPointX);
             this.xtraTabPage2.Controls.Add(this.labelControl3);
@@ -145,18 +155,6 @@
             this.xtraTabPage2.Name = "xtraTabPage2";
             this.xtraTabPage2.Size = new System.Drawing.Size(1000, 944);
             this.xtraTabPage2.Text = "真实摄像头";
-            // 
-            // radioInnerImage
-            // 
-            this.radioInnerImage.AutoSize = true;
-            this.radioInnerImage.Font = new System.Drawing.Font("微软雅黑 Light", 12F);
-            this.radioInnerImage.Location = new System.Drawing.Point(695, 894);
-            this.radioInnerImage.Name = "radioInnerImage";
-            this.radioInnerImage.Size = new System.Drawing.Size(76, 25);
-            this.radioInnerImage.TabIndex = 19;
-            this.radioInnerImage.Text = "画中画";
-            this.radioInnerImage.UseVisualStyleBackColor = true;
-            this.radioInnerImage.CheckedChanged += new System.EventHandler(this.radioInnerImage_CheckedChanged);
             // 
             // radioLowlight
             // 
@@ -180,7 +178,7 @@
             this.radioTV.Size = new System.Drawing.Size(60, 25);
             this.radioTV.TabIndex = 17;
             this.radioTV.TabStop = true;
-            this.radioTV.Text = "电视";
+            this.radioTV.Text = "可见光";
             this.radioTV.UseVisualStyleBackColor = true;
             this.radioTV.CheckedChanged += new System.EventHandler(this.radioTV_CheckedChanged);
             // 
@@ -211,12 +209,23 @@
             this.btLockTarget.Appearance.Options.UseFont = true;
             this.btLockTarget.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.RightCenter;
             this.btLockTarget.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btLockTarget.ImageOptions.SvgImage")));
-            this.btLockTarget.Location = new System.Drawing.Point(841, 809);
+            this.btLockTarget.Location = new System.Drawing.Point(890, 809);
             this.btLockTarget.Name = "btLockTarget";
-            this.btLockTarget.Size = new System.Drawing.Size(145, 74);
+            this.btLockTarget.Size = new System.Drawing.Size(100, 36);
             this.btLockTarget.TabIndex = 13;
             this.btLockTarget.Text = "跟踪";
             this.btLockTarget.Click += new System.EventHandler(this.btLockTarget_Click);
+            // 
+            // btCancelTrack
+            // 
+            this.btCancelTrack.Appearance.Font = new System.Drawing.Font("微软雅黑 Light", 13F);
+            this.btCancelTrack.Appearance.Options.UseFont = true;
+            this.btCancelTrack.Location = new System.Drawing.Point(890, 847);
+            this.btCancelTrack.Name = "btCancelTrack";
+            this.btCancelTrack.Size = new System.Drawing.Size(100, 36);
+            this.btCancelTrack.TabIndex = 20;
+            this.btCancelTrack.Text = "取消跟踪";
+            this.btCancelTrack.Click += new System.EventHandler(this.btCancelTrack_Click);
             // 
             // textPointY
             // 
@@ -225,7 +234,7 @@
             this.textPointY.Name = "textPointY";
             this.textPointY.Properties.Appearance.Font = new System.Drawing.Font("微软雅黑 Light", 13F);
             this.textPointY.Properties.Appearance.Options.UseFont = true;
-            this.textPointY.Size = new System.Drawing.Size(134, 30);
+            this.textPointY.Size = new System.Drawing.Size(55, 30);
             this.textPointY.TabIndex = 11;
             // 
             // textPointX
@@ -235,8 +244,48 @@
             this.textPointX.Name = "textPointX";
             this.textPointX.Properties.Appearance.Font = new System.Drawing.Font("微软雅黑 Light", 13F);
             this.textPointX.Properties.Appearance.Options.UseFont = true;
-            this.textPointX.Size = new System.Drawing.Size(134, 30);
+            this.textPointX.Size = new System.Drawing.Size(55, 30);
             this.textPointX.TabIndex = 10;
+            // 
+            // labelGateWidth
+            // 
+            this.labelGateWidth.Appearance.Font = new System.Drawing.Font("微软雅黑 Light", 13F);
+            this.labelGateWidth.Appearance.Options.UseFont = true;
+            this.labelGateWidth.Location = new System.Drawing.Point(754, 812);
+            this.labelGateWidth.Name = "labelGateWidth";
+            this.labelGateWidth.Size = new System.Drawing.Size(78, 24);
+            this.labelGateWidth.TabIndex = 21;
+            this.labelGateWidth.Text = "波门框宽:";
+            // 
+            // textGateWidth
+            // 
+            this.textGateWidth.EditValue = "64";
+            this.textGateWidth.Location = new System.Drawing.Point(832, 810);
+            this.textGateWidth.Name = "textGateWidth";
+            this.textGateWidth.Properties.Appearance.Font = new System.Drawing.Font("微软雅黑 Light", 13F);
+            this.textGateWidth.Properties.Appearance.Options.UseFont = true;
+            this.textGateWidth.Size = new System.Drawing.Size(52, 30);
+            this.textGateWidth.TabIndex = 22;
+            // 
+            // labelGateHeight
+            // 
+            this.labelGateHeight.Appearance.Font = new System.Drawing.Font("微软雅黑 Light", 13F);
+            this.labelGateHeight.Appearance.Options.UseFont = true;
+            this.labelGateHeight.Location = new System.Drawing.Point(754, 853);
+            this.labelGateHeight.Name = "labelGateHeight";
+            this.labelGateHeight.Size = new System.Drawing.Size(78, 24);
+            this.labelGateHeight.TabIndex = 23;
+            this.labelGateHeight.Text = "波门框高:";
+            // 
+            // textGateHeight
+            // 
+            this.textGateHeight.EditValue = "64";
+            this.textGateHeight.Location = new System.Drawing.Point(832, 852);
+            this.textGateHeight.Name = "textGateHeight";
+            this.textGateHeight.Properties.Appearance.Font = new System.Drawing.Font("微软雅黑 Light", 13F);
+            this.textGateHeight.Properties.Appearance.Options.UseFont = true;
+            this.textGateHeight.Size = new System.Drawing.Size(52, 30);
+            this.textGateHeight.TabIndex = 24;
             // 
             // labelControl3
             // 
@@ -531,6 +580,8 @@
             this.xtraTabPage2.ResumeLayout(false);
             this.xtraTabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.checkAutoSendByClick.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.textGateWidth.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.textGateHeight.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.textPointY.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.textPointX.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.buttonEdit2.Properties)).EndInit();
@@ -566,7 +617,12 @@
         private DevExpress.XtraEditors.SimpleButton btLoadImage;
         private DevExpress.XtraEditors.LabelControl labelControl1;
         private DevExpress.XtraEditors.CheckEdit checkAutoSendByClick;
+        private DevExpress.XtraEditors.SimpleButton btCancelTrack;
         private DevExpress.XtraEditors.SimpleButton btLockTarget;
+        private DevExpress.XtraEditors.TextEdit textGateHeight;
+        private DevExpress.XtraEditors.TextEdit textGateWidth;
+        private DevExpress.XtraEditors.LabelControl labelGateHeight;
+        private DevExpress.XtraEditors.LabelControl labelGateWidth;
         private DevExpress.XtraEditors.TextEdit textPointY;
         private DevExpress.XtraEditors.TextEdit textPointX;
         private DevExpress.XtraEditors.LabelControl labelControl3;
@@ -582,7 +638,6 @@
         private System.Windows.Forms.Integration.ElementHost elementHost1;
         private ScoutPerspectiveWpf scoutPerspectiveWpf3;
         private DevExpress.XtraEditors.LabelControl bookstatelab;
-        private System.Windows.Forms.RadioButton radioInnerImage;
         private System.Windows.Forms.RadioButton radioLowlight;
         private System.Windows.Forms.RadioButton radioTV;
     }

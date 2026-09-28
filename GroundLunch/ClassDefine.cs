@@ -1,4 +1,4 @@
-﻿using DevExpress.XtraEditors;
+using DevExpress.XtraEditors;
 using DevExpress.XtraPrinting.Native;
 using DevExpress.XtraScheduler.Drawing;
 using MathNet.Numerics.LinearAlgebra;
@@ -393,6 +393,8 @@ namespace GroundLunch
             groundData.lanuchHigh = uintValue * 1e-3;
             ushortValue = BitConverter.ToUInt16(payLoad, curPos); curPos += 2;
             groundData.lanuchAzimuth = ushortValue * 1e-2;
+            //shortValue = BitConverter.ToInt16(payLoad, curPos); curPos += 2;
+            //groundData.lanuchAzimuth = shortValue * 1e-2;
             shortValue = BitConverter.ToInt16(payLoad, curPos); curPos += 2;
             groundData.lanuchPitch = shortValue * 1e-2;
             //IO检测

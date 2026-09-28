@@ -1,4 +1,4 @@
-﻿namespace GroundLunch.PlaybackPage
+namespace GroundLunch.PlaybackPage
 {
     partial class AnalyzeDatForm
     {

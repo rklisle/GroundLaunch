@@ -1,4 +1,4 @@
-﻿using DevExpress.Charts.Native;
+using DevExpress.Charts.Native;
 using DevExpress.Utils.MVVM.Services;
 using DevExpress.XtraCharts;
 //using DocumentFormat.OpenXml.Spreadsheet;
@@ -375,6 +375,19 @@ namespace GroundLunch
             //要向所有飞机更新任务信息
             foreach (MsnFlightGroup group in missionFiles[selectedMissionIndex].flightGroups)
             {
+                if (group.airLine != null && group.airLine.Count > 0)
+                {
+                    WayPoint initWp = group.airLine.Find(w => w.wpType == 0);
+                    if (initWp == null)
+                        initWp = group.airLine[0];
+                    if (initWp.dir < 0 || initWp.dir >= 360)
+                    {
+                        MessageBox.Show(string.Format(
+                            "初始航向角 {1:F2}° 不在 0~359.99，无法装订任务",
+                            group.groupName, initWp.dir));
+                        return;
+                    }
+                }
                 foreach (MsnPlane plane in group.planes) 
                 {
                     //默认需要分包，依据为安全区点个数和航点个数
@@ -393,7 +406,7 @@ namespace GroundLunch
                     }
                     if (group.airLine.Count > 36)
                     {
-                        MessageBox.Show("航点数超过36个，要加钱才能用");
+                        MessageBox.Show("航点数超过36个，请减少航点");
                         return;
                     }
                     //第一包
@@ -403,14 +416,17 @@ namespace GroundLunch
                     data[2] = (byte)plane.msnID;
                     data[3] = (byte)missionFiles[selectedMissionIndex].safeArea.Count;
                     data[4] = (byte)group.airLine.Count;
+                    data[5] = missionFiles[selectedMissionIndex].navAlignMode;
+                    Buffer.BlockCopy(BitConverter.GetBytes(missionFiles[selectedMissionIndex].navAlignTimeSec), 0, data, 6, 2);
                     for (int i = 0; i < missionFiles[selectedMissionIndex].safeArea.Count; i++)
                     {
                         int iLon = (int)(missionFiles[selectedMissionIndex].safeArea[i].lon * 1e7);
                         int iLat = (int)(missionFiles[selectedMissionIndex].safeArea[i].lat * 1e7);
-                        Buffer.BlockCopy(BitConverter.GetBytes(iLon), 0, data, 5 + i*2*4, 4);
-                        Buffer.BlockCopy(BitConverter.GetBytes(iLat), 0, data, 9 + i*2*4, 4);
+                        Buffer.BlockCopy(BitConverter.GetBytes(iLon), 0, data, 8 + i * 8, 4);
+                        Buffer.BlockCopy(BitConverter.GetBytes(iLat), 0, data, 12 + i * 8, 4);
                     }
-                    NetDataHandle.Send_To_TM(plane.paoID, plane.guanID, (ushort)(5 + 8 * missionFiles[selectedMissionIndex].safeArea.Count), 0x13, data);
+                    NetDataHandle.Send_To_TM(plane.paoID, plane.guanID, (ushort)(8 + 8 * missionFiles[selectedMissionIndex].safeArea.Count), 0x13, data);
+                    System.Threading.Thread.Sleep(10); // 等飞控处理完包0，避免被后续航点包覆盖
 
                     //第二三四包
                     byte[] pointsByte = new byte[17 * 36];
@@ -421,7 +437,11 @@ namespace GroundLunch
                         int iLon = (int)(wayPoint.lon * 1e7);
                         int iLat = (int)(wayPoint.lat * 1e7);
                         Int16 iAlt = (Int16)(wayPoint.alt);
-                        Int16 iDir = (Int16)(wayPoint.dir * 100);
+                        // 0~360°×100 最大 36000，超过 Int16(32767)；328° 会溢出成约 32.6°
+                        double dir360 = wayPoint.dir % 360.0;
+                        if (dir360 < 0)
+                            dir360 += 360.0;
+                        UInt16 iDir = (UInt16)Math.Round(dir360 * 100.0);
                         Int16 iRadis = (Int16)(wayPoint.radis);
                         UInt16 iSpeed = (UInt16)(wayPoint.speed);
                         Buffer.BlockCopy(BitConverter.GetBytes(iLon), 0, wp, 0, 4);
@@ -442,6 +462,7 @@ namespace GroundLunch
                         sendPointsPacketByte[0] = (byte)(s / 12 + 1);
                         Buffer.BlockCopy(pointsByte, s * 17, sendPointsPacketByte, 1, 12 * 17);
                         NetDataHandle.Send_To_TM(plane.paoID, plane.guanID, (ushort)(205), 0x13, sendPointsPacketByte);
+                        System.Threading.Thread.Sleep(10);
                         s += 12;
                     }
                 }
@@ -450,7 +471,10 @@ namespace GroundLunch
         }
         private void AutoLoadMsnList()
         {
-            foreach (string file in Directory.EnumerateFiles("./Msn", "*.xml", SearchOption.AllDirectories))
+            string msnDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Msn");
+            if (!Directory.Exists(msnDir))
+                return;
+            foreach (string file in Directory.EnumerateFiles(msnDir, "*.xml", SearchOption.AllDirectories))
             {
                 FileStream reader = new FileStream(file, FileMode.Open);
                 XmlSerializer zer = new XmlSerializer(typeof(MissionFile));
@@ -507,6 +531,13 @@ namespace GroundLunch
         public List<MsnFlightGroup> flightGroups = new List<MsnFlightGroup>();
         public List<WayPoint> safeArea = new List<WayPoint>();
 
+        /// <summary>导航对准模式：0=水平，1=垂直。
+        [XmlAttribute]
+        public byte navAlignMode = 1;
+
+        [XmlAttribute]
+        public ushort navAlignTimeSec = 210;
+
         [XmlIgnore]
         public string FileName;
 
@@ -527,8 +558,6 @@ namespace GroundLunch
         {
             get { return getPlaneCount().ToString(); }
         }
-
-
 
         public int getPlaneCount()
         {
@@ -567,15 +596,19 @@ namespace GroundLunch
                 switch (wpType)
                 {
                     case 0:
-                        return "起飞";
+                        return "起飞点";
                     case 1:
-                        return "航点";
+                        return "普通航点";
                     case 2:
-                        return "盘旋";
+                        return "指点飞行";
                     case 3:
-                        return "攻击";
+                        return "盘旋飞行";
+                    case 4:
+                        return "打击点";
                     case 5:
-                        return "回收";
+                        return "佯攻点";
+                    case 6:
+                        return "回收点";
                     default:
                         return "未知";
                 }

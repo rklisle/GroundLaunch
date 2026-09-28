@@ -1,4 +1,4 @@
-﻿using DevExpress.Utils.Extensions;
+using DevExpress.Utils.Extensions;
 using DevExpress.XtraCharts;
 using SharpGL.SceneGraph.Primitives;
 using System;

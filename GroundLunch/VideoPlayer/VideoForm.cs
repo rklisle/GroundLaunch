@@ -1,4 +1,4 @@
-﻿using DevExpress.XtraCharts;
+using DevExpress.XtraCharts;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,6 +25,7 @@ namespace GroundLunch
         public int paoID;
         public int guanID;
         int startFly = 0;
+        int bjTimeSyncDiv = 0;
 
         //public double curTime = 0;
 
@@ -41,6 +42,38 @@ namespace GroundLunch
             //throw new NotImplementedException();
         }
 
+        private UInt16 ParseU16(string text, UInt16 fallback)
+        {
+            UInt16 v;
+            return UInt16.TryParse(text, out v) ? v : fallback;
+        }
+
+        internal void SendLockTarget(UInt16 x, UInt16 y)
+        {
+            UInt16 w = ParseU16(textGateWidth.Text, 64);
+            UInt16 h = ParseU16(textGateHeight.Text, 64);
+            UInt32 frameNo = 0;
+            byte[] sendData = new byte[12];
+            Buffer.BlockCopy(BitConverter.GetBytes(x), 0, sendData, 0, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes(y), 0, sendData, 2, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes(w), 0, sendData, 4, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes(h), 0, sendData, 6, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes(frameNo), 0, sendData, 8, 4);
+            NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan,
+                12, 0xD3, sendData);
+        }
+
+        private void btLockTarget_Click(object sender, EventArgs e)
+        {
+            SendLockTarget(ParseU16(textPointX.Text, 0), ParseU16(textPointY.Text, 0));
+        }
+
+        private void btCancelTrack_Click(object sender, EventArgs e)
+        {
+            NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan,
+                0, 0xD5, new byte[0]);
+        }
+
         private void VideoForm_Shown(object sender, EventArgs e)
         {
         }
@@ -50,8 +83,13 @@ namespace GroundLunch
             if (this.Visible)
             {
                 RefreshUITimer.Interval = 50;
-                RefreshUITimer.Tick += new EventHandler(OnTimerFresh);
+                RefreshUITimer.Tick -= OnTimerFresh;
+                RefreshUITimer.Tick += OnTimerFresh;
                 RefreshUITimer.Start();
+            }
+            else
+            {
+                RefreshUITimer.Stop();
             }
         }
         private void VideoForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -113,6 +151,14 @@ namespace GroundLunch
             }
             //将数据同步到wpf
             int year=0, month=0, day = 0, hour = 0, minute = 0, second = 0, ms = 0;
+            // 每帧清零，避免链路中断后 HDU 一直显示旧空速/高度
+            DataInterface.viewPlane.speed = 0;
+            DataInterface.viewPlane.alt = 0;
+            DataInterface.viewPlane.pitch = 0;
+            DataInterface.viewPlane.heading = 0;
+            DataInterface.viewPlane.roll = 0;
+            double navHigh = 0;
+            bool gotCurAlt = false, gotNavHigh = false;
 
             foreach (TMParam param in allParamList)
             {
@@ -132,7 +178,7 @@ namespace GroundLunch
                 {
                     DataInterface.viewPlane.rpm = Convert.ToDouble(param.物理量);
                 }
-                if (param.paramID == "GrdSpd")
+                if (param.paramID == "AirSpd")
                 {
                     DataInterface.viewPlane.speed = Convert.ToDouble(param.物理量);
                 }
@@ -144,55 +190,63 @@ namespace GroundLunch
                 {
                    // DataInterface.viewPlane.scoutHeading = Convert.ToDouble(param.物理量);
                 }
-                if (param.paramID == "navPitch" && param.paramDataPool == "imu")
+                if (param.paramID == "navPitch" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                 {
                     DataInterface.viewPlane.pitch = Convert.ToDouble(param.物理量);
                 }
-                if (param.paramID == "navDir" && param.paramDataPool == "imu")
+                if (param.paramID == "navDir" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                 {
                     DataInterface.viewPlane.heading = Convert.ToDouble(param.物理量);
                 }
-                if (param.paramID == "navRoll" && param.paramDataPool == "imu")
+                if (param.paramID == "navRoll" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                 {
                     DataInterface.viewPlane.roll = Convert.ToDouble(param.物理量);
                 }
-                if (param.paramID == "navLon" && param.paramDataPool == "imu")
+                if (param.paramID == "navLon" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                 {
                     DataInterface.viewPlane.lon = Convert.ToDouble(param.物理量);
                 }
-                if (param.paramID == "navLat" && param.paramDataPool == "imu")
+                if (param.paramID == "navLat" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                 {
                     DataInterface.viewPlane.lat = Convert.ToDouble(param.物理量);
                 }
-                if (param.paramID == "navHigh" && param.paramDataPool == "imu")
+                if (param.paramID == "curAlt")
                 {
                     DataInterface.viewPlane.alt = Convert.ToDouble(param.物理量);
+                    gotCurAlt = true;
                 }
-                if (param.paramID == "gpsYear" && param.paramDataPool == "imu")
+                if (param.paramID == "navHigh" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
+                {
+                    navHigh = Convert.ToDouble(param.物理量);
+                    gotNavHigh = true;
+                }
+                // GPS 时间在遥测表中为 nav 池（不是 imu）
+                if (param.paramID == "gpsYear" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                 {
                     year = Convert.ToInt32(param.物理量);
                 }
-                if (param.paramID == "gpsMonth" && param.paramDataPool == "imu")
+                if (param.paramID == "gpsMonth" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                 {
                     month = Convert.ToInt32(param.物理量);
                 }
-                if (param.paramID == "gpsDay" && param.paramDataPool == "imu")
+                if (param.paramID == "gpsDay" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                 {
                     day = Convert.ToInt32(param.物理量);
                 }
-                if (param.paramID == "gpsHour" && param.paramDataPool == "imu")
+                if (param.paramID == "gpsHour" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                 {
                     hour = Convert.ToInt32(param.物理量);
                 }
-                if (param.paramID == "gpsMinit" && param.paramDataPool == "imu")
+                if (param.paramID == "gpsMinit" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                 {
                     minute = Convert.ToInt32(param.物理量);
                 }
-                if (param.paramID == "gpsSec" && param.paramDataPool == "imu")
+                if (param.paramID == "gpsSec" && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                 {
                     second = Convert.ToInt32(param.物理量);
                 }
-                if (param.paramID == "gpsMSec" && param.paramDataPool == "imu")
+                if ((param.paramID == "gpsMSec" || param.paramID == "gpsMs")
+                    && (param.paramDataPool == "imu" || param.paramDataPool == "nav"))
                 {
                     ms = Convert.ToInt32(param.物理量);
                 }
@@ -207,24 +261,52 @@ namespace GroundLunch
                 }
                 if (param.paramID == "luncTime")
                 {
-                    DateTime baseDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-                    // 假设这是从2000年1月1日以来经过的秒数
-                    long secondsSince2000 = (long)param.paramSourceCode; // 示例秒数，可替换为实际值
-
-                    // 将秒数转换为TimeSpan
-                    TimeSpan timeSpan = TimeSpan.FromSeconds(secondsSince2000);
-
-                    // 计算目标UTC时间
-                    DateTime targetDate = baseDate.Add(timeSpan);
-
-                    string dateString = targetDate.ToString("u");
-                    dateString = dateString.Substring(0, dateString.Length - 1);
-                    labelLuanchTime.Text = "发射零时 " + dateString;
+                    // 飞控：相对 2000-01-01 的秒数；仅点火(DoIgnition)时写入，未授时则为 0
+                    long secondsSince2000 = (long)param.paramSourceCode;
+                    if (secondsSince2000 > 0)
+                    {
+                        DateTime baseDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Unspecified);
+                        DateTime targetDate = baseDate.AddSeconds(secondsSince2000);
+                        labelLuanchTime.Text = "发射零时 " + targetDate.ToString("yyyy-MM-dd HH:mm:ss");
+                    }
+                    else
+                    {
+                        labelLuanchTime.Text = "发射零时 未记录";
+                    }
                 }
             }
-            string date = string.Format("北京时间 20{0:D2}-{1:D2}-{2:D2} {3:D2}:{4:D2}:{5:D2}", year, month, day, hour, minute, second);
-            labelBJTime.Text = date;
+
+            // 起飞前周期性对时（半实物无 GPS）；已起飞则不再发，避免无意义
+            if (startFly == 0 && (++bjTimeSyncDiv % 40) == 0) // ~2s @50ms
+            {
+                try { NetDataHandle.SendBjTimeSet(paoID, guanID); } catch { }
+            }
+            // 仅当控制包无 curAlt 时才用导航高度；curAlt=0 时不再用旧 navHigh 顶住
+            if (!gotCurAlt && gotNavHigh)
+                DataInterface.viewPlane.alt = navHigh;
+
+            // gpsYear：飞控 IMU 路径存 year-2000；表头单位写的是 1970+；半实物常不填 GPS 时间
+            int fullYear;
+            if (year <= 0)
+                fullYear = 0;
+            else if (year < 100)
+                fullYear = 2000 + year;
+            else if (year < 1900)
+                fullYear = 1970 + year;
+            else
+                fullYear = year;
+
+            if (fullYear >= 2000 && month >= 1 && month <= 12 && day >= 1 && day <= 31)
+            {
+                labelBJTime.Text = string.Format("北京时间 {0:D4}-{1:D2}-{2:D2} {3:D2}:{4:D2}:{5:D2}",
+                    fullYear, month, day, hour, minute, second);
+            }
+            else
+            {
+                // GPS 未授时（仿真/HIL 常见）：用本机时间，避免一直停在 2000/2048-00-00
+                labelBJTime.Text = "本机时间 " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+
             tmhdu1.SetLocation(DataInterface.viewPlane.pitch,
                 DataInterface.viewPlane.heading,
                 DataInterface.viewPlane.roll,
@@ -232,22 +314,37 @@ namespace GroundLunch
                 DataInterface.viewPlane.speed);
             DataInterface.isUpdate = 1;
 
-            labelDbm.Text = string.Format("信号强度 {0}dbm", NetDataHandle.planeConnectDbm[(paoID,guanID)].ToString());
-            if (NetDataHandle.planeConnectDbm[(paoID, guanID)] > -70)
+            int dbm = -128;
+            if (NetDataHandle.planeConnectDbm.ContainsKey((paoID, guanID)))
+                dbm = NetDataHandle.planeConnectDbm[(paoID, guanID)];
+
+            int tmOnline = 0;
+            if (NetDataHandle.planeConnectStatus.ContainsKey((paoID, guanID)))
+                tmOnline = NetDataHandle.planeConnectStatus[(paoID, guanID)];
+
+            if (dbm == -128)
             {
-                labelDbm.ForeColor = Color.Lime;
-            }
-            else if (NetDataHandle.planeConnectDbm[(paoID, guanID)] > -95)
-            {
-                labelDbm.ForeColor = Color.Orange;
-            }
-            else 
-            {
-                labelDbm.ForeColor = Color.Red;
-                if (NetDataHandle.planeConnectDbm[(paoID, guanID)] == -128)
+                // 无数传 RSSI：若 UDP 遥测在刷新，仍提示在线，避免一直 ---dbm
+                if (tmOnline > 0)
+                {
+                    labelDbm.Text = "信号强度 遥测在线";
+                    labelDbm.ForeColor = Color.Orange;
+                }
+                else
                 {
                     labelDbm.Text = "信号强度 ---dbm";
+                    labelDbm.ForeColor = Color.Red;
                 }
+            }
+            else
+            {
+                labelDbm.Text = string.Format("信号强度 {0}dbm", dbm);
+                if (dbm > -70)
+                    labelDbm.ForeColor = Color.Lime;
+                else if (dbm > -95)
+                    labelDbm.ForeColor = Color.Orange;
+                else
+                    labelDbm.ForeColor = Color.Red;
             }
         }
 
@@ -276,19 +373,6 @@ namespace GroundLunch
             {
                 chartFlight.Series.Add(new Series());
             }
-        }
-
-        private void btLockTarget_Click(object sender, EventArgs e)
-        {
-            UInt16 x = Convert.ToUInt16(textPointX.Text);
-            UInt16 y = Convert.ToUInt16(textPointY.Text);
-            UInt32 frameNo = 0;
-            byte[] sendData = new byte[8];
-            Buffer.BlockCopy(BitConverter.GetBytes(x), 0, sendData, 0, 2);
-            Buffer.BlockCopy(BitConverter.GetBytes(y), 0, sendData, 2, 2);
-            Buffer.BlockCopy(BitConverter.GetBytes(frameNo), 0, sendData, 4, 4);
-            NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan,
-                8, 0xD3, sendData);
         }
 
         public void RefreshUI()
@@ -557,13 +641,13 @@ namespace GroundLunch
         {
 
             byte[] data = new byte[1];
-            NetDataHandle.Send_To_TM(NetDataHandle.curGuan, NetDataHandle.curPao, 0, 0x22, data);
+            NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan, 0, 0x22, data);
             /*
             if (btDoUmb.Text == "已执行紧急伞降")
             {
                 //再次发出紧急伞降指令
                 byte[] data = new byte[1];
-                NetDataHandle.Send_To_TM(NetDataHandle.curGuan, NetDataHandle.curPao, 0, 0x22, data);
+                NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan, 0, 0x22, data);
                 return;
             }
                
@@ -576,7 +660,7 @@ namespace GroundLunch
             {
                 btDoUmb.Text = "已执行紧急伞降";
                 byte[] data = new byte[1];
-                NetDataHandle.Send_To_TM(NetDataHandle.curGuan, NetDataHandle.curPao, 0, 0x22, data);
+                NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan, 0, 0x22, data);
             }
             */
         }
@@ -585,7 +669,7 @@ namespace GroundLunch
         {
             //btHome.Text = "已执行紧急返航";
             byte[] data = new byte[1];
-            NetDataHandle.Send_To_TM(NetDataHandle.curGuan, NetDataHandle.curPao, 0, 0x23, data);
+            NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan, 0, 0x23, data);
         }
 
         private void btSaveExcel_Click(object sender, EventArgs e)
@@ -615,24 +699,20 @@ namespace GroundLunch
 
         private void radioLowlight_CheckedChanged(object sender, EventArgs e)
         {
+            if (!radioLowlight.Checked)
+                return;
             byte[] data = new byte[1];
-            data[0] = 1;
+            data[0] = 2; // 协议 0x09：红外波段 0x02
             NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan,
                 1, 0xD4, data);
         }
 
         private void radioTV_CheckedChanged(object sender, EventArgs e)
         {
+            if (!radioTV.Checked)
+                return;
             byte[] data = new byte[1];
-            data[0] = 0;
-            NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan,
-                1, 0xD4, data);
-        }
-
-        private void radioInnerImage_CheckedChanged(object sender, EventArgs e)
-        {
-            byte[] data = new byte[1];
-            data[0] = 2;
+            data[0] = 1; // 协议 0x09：可见光波段 0x01
             NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan,
                 1, 0xD4, data);
         }

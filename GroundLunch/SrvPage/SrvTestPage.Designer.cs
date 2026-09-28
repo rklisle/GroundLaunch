@@ -1,4 +1,4 @@
-﻿namespace GroundLunch
+namespace GroundLunch
 {
     partial class SrvTestPage
     {
@@ -30,9 +30,9 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SrvTestPage));
-            DevExpress.XtraCharts.XYDiagram xyDiagram2 = new DevExpress.XtraCharts.XYDiagram();
-            DevExpress.XtraCharts.Series series2 = new DevExpress.XtraCharts.Series();
-            DevExpress.XtraCharts.LineSeriesView lineSeriesView2 = new DevExpress.XtraCharts.LineSeriesView();
+            DevExpress.XtraCharts.XYDiagram xyDiagram1 = new DevExpress.XtraCharts.XYDiagram();
+            DevExpress.XtraCharts.Series series1 = new DevExpress.XtraCharts.Series();
+            DevExpress.XtraCharts.LineSeriesView lineSeriesView1 = new DevExpress.XtraCharts.LineSeriesView();
             this.groupControl3 = new DevExpress.XtraEditors.GroupControl();
             this.checkSrv8 = new DevExpress.XtraEditors.CheckEdit();
             this.checkSrv7 = new DevExpress.XtraEditors.CheckEdit();
@@ -168,11 +168,15 @@
             this.labelControl12 = new DevExpress.XtraEditors.LabelControl();
             this.spin5MM = new DevExpress.XtraEditors.SpinEdit();
             this.spin6MM = new DevExpress.XtraEditors.SpinEdit();
+            this.spin7MM = new DevExpress.XtraEditors.SpinEdit();
             this.labelControl19 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl20 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl21 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl23 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl25 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl66 = new DevExpress.XtraEditors.LabelControl();
+            this.labelControl67 = new DevExpress.XtraEditors.LabelControl();
+            this.labelCur7 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
             this.labelControl11 = new DevExpress.XtraEditors.LabelControl();
             this.spin1MM = new DevExpress.XtraEditors.SpinEdit();
@@ -290,13 +294,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.seqWidth.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seqChannel.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartSrv)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(xyDiagram2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(series2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(lineSeriesView2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(xyDiagram1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(series1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(lineSeriesView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).BeginInit();
             this.groupControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.spin5MM.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.spin6MM.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.spin7MM.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.spin1MM.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.spin2MM.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.spin3MM.Properties)).BeginInit();
@@ -1840,25 +1845,25 @@
             this.labelControl10.Location = new System.Drawing.Point(11, 16);
             this.labelControl10.Margin = new System.Windows.Forms.Padding(2);
             this.labelControl10.Name = "labelControl10";
-            this.labelControl10.Size = new System.Drawing.Size(432, 41);
+            this.labelControl10.Size = new System.Drawing.Size(453, 41);
             this.labelControl10.TabIndex = 35;
-            this.labelControl10.Text = "PJ60-Y1 巡飞器遥控系统";
+            this.labelControl10.Text = "PJ150-Y1 巡飞器遥控系统";
             // 
             // chartSrv
             // 
-            xyDiagram2.AxisX.Visibility = DevExpress.Utils.DefaultBoolean.True;
-            xyDiagram2.AxisX.VisibleInPanesSerializable = "-1";
-            xyDiagram2.AxisY.Visibility = DevExpress.Utils.DefaultBoolean.True;
-            xyDiagram2.AxisY.VisibleInPanesSerializable = "-1";
-            this.chartSrv.Diagram = xyDiagram2;
-            this.chartSrv.Legend.Font = new System.Drawing.Font("Tahoma", 11F);
+            xyDiagram1.AxisX.Visibility = DevExpress.Utils.DefaultBoolean.True;
+            xyDiagram1.AxisX.VisibleInPanesSerializable = "-1";
+            xyDiagram1.AxisY.Visibility = DevExpress.Utils.DefaultBoolean.True;
+            xyDiagram1.AxisY.VisibleInPanesSerializable = "-1";
+            this.chartSrv.Diagram = xyDiagram1;
+            this.chartSrv.Legend.DXFont = new DevExpress.Drawing.DXFont("Tahoma", 11F);
             this.chartSrv.Location = new System.Drawing.Point(1344, 71);
             this.chartSrv.Margin = new System.Windows.Forms.Padding(2);
             this.chartSrv.Name = "chartSrv";
-            series2.Name = "Series 1";
-            series2.View = lineSeriesView2;
+            series1.Name = "Series 1";
+            series1.View = lineSeriesView1;
             this.chartSrv.SeriesSerializable = new DevExpress.XtraCharts.Series[] {
-        series2};
+        series1};
             this.chartSrv.Size = new System.Drawing.Size(534, 860);
             this.chartSrv.TabIndex = 28;
             // 
@@ -1871,11 +1876,15 @@
             this.groupControl1.Controls.Add(this.labelControl12);
             this.groupControl1.Controls.Add(this.spin5MM);
             this.groupControl1.Controls.Add(this.spin6MM);
+            this.groupControl1.Controls.Add(this.spin7MM);
             this.groupControl1.Controls.Add(this.labelControl19);
             this.groupControl1.Controls.Add(this.labelControl20);
             this.groupControl1.Controls.Add(this.labelControl21);
             this.groupControl1.Controls.Add(this.labelControl23);
             this.groupControl1.Controls.Add(this.labelControl25);
+            this.groupControl1.Controls.Add(this.labelControl66);
+            this.groupControl1.Controls.Add(this.labelControl67);
+            this.groupControl1.Controls.Add(this.labelCur7);
             this.groupControl1.Controls.Add(this.labelControl1);
             this.groupControl1.Controls.Add(this.labelControl11);
             this.groupControl1.Controls.Add(this.spin1MM);
@@ -1896,7 +1905,7 @@
             this.groupControl1.Location = new System.Drawing.Point(11, 71);
             this.groupControl1.Margin = new System.Windows.Forms.Padding(2);
             this.groupControl1.Name = "groupControl1";
-            this.groupControl1.Size = new System.Drawing.Size(414, 413);
+            this.groupControl1.Size = new System.Drawing.Size(414, 462);
             this.groupControl1.TabIndex = 27;
             this.groupControl1.Text = "伺服控制";
             // 
@@ -1907,7 +1916,7 @@
             this.btSetSrvZero.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btSetSrvZero.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleLeft;
             this.btSetSrvZero.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btSetSrvZero.ImageOptions.SvgImage")));
-            this.btSetSrvZero.Location = new System.Drawing.Point(217, 357);
+            this.btSetSrvZero.Location = new System.Drawing.Point(220, 375);
             this.btSetSrvZero.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btSetSrvZero.Name = "btSetSrvZero";
             this.btSetSrvZero.Size = new System.Drawing.Size(160, 43);
@@ -1970,6 +1979,28 @@
             this.spin6MM.Size = new System.Drawing.Size(83, 30);
             this.spin6MM.TabIndex = 20;
             // 
+            // spin7MM
+            // 
+            this.spin7MM.EditValue = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            this.spin7MM.Location = new System.Drawing.Point(297, 338);
+            this.spin7MM.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.spin7MM.Name = "spin7MM";
+            this.spin7MM.Properties.Appearance.Font = new System.Drawing.Font("微软雅黑 Light", 13F);
+            this.spin7MM.Properties.Appearance.Options.UseFont = true;
+            this.spin7MM.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.spin7MM.Properties.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.spin7MM.Size = new System.Drawing.Size(83, 30);
+            this.spin7MM.TabIndex = 36;
+            // 
             // labelControl19
             // 
             this.labelControl19.Appearance.Font = new System.Drawing.Font("微软雅黑 Light", 13F);
@@ -2024,6 +2055,39 @@
             this.labelControl25.Size = new System.Drawing.Size(22, 23);
             this.labelControl25.TabIndex = 27;
             this.labelControl25.Text = "0.0";
+            // 
+            // labelControl66
+            // 
+            this.labelControl66.Appearance.Font = new System.Drawing.Font("微软雅黑 Light", 13F);
+            this.labelControl66.Appearance.Options.UseFont = true;
+            this.labelControl66.Location = new System.Drawing.Point(20, 350);
+            this.labelControl66.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.labelControl66.Name = "labelControl66";
+            this.labelControl66.Size = new System.Drawing.Size(154, 24);
+            this.labelControl66.TabIndex = 37;
+            this.labelControl66.Text = "舵机7当前线位移：";
+            // 
+            // labelControl67
+            // 
+            this.labelControl67.Appearance.Font = new System.Drawing.Font("微软雅黑 Light", 13F);
+            this.labelControl67.Appearance.Options.UseFont = true;
+            this.labelControl67.Location = new System.Drawing.Point(240, 350);
+            this.labelControl67.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.labelControl67.Name = "labelControl67";
+            this.labelControl67.Size = new System.Drawing.Size(30, 23);
+            this.labelControl67.TabIndex = 39;
+            this.labelControl67.Text = "mm";
+            // 
+            // labelCur7
+            // 
+            this.labelCur7.Appearance.Font = new System.Drawing.Font("微软雅黑 Light", 13F);
+            this.labelCur7.Appearance.Options.UseFont = true;
+            this.labelCur7.Location = new System.Drawing.Point(184, 350);
+            this.labelCur7.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.labelCur7.Name = "labelCur7";
+            this.labelCur7.Size = new System.Drawing.Size(22, 23);
+            this.labelCur7.TabIndex = 38;
+            this.labelCur7.Text = "0.0";
             // 
             // labelControl1
             // 
@@ -2252,7 +2316,7 @@
             this.btSetAll.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btSetAll.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleLeft;
             this.btSetAll.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btSetAll.ImageOptions.SvgImage")));
-            this.btSetAll.Location = new System.Drawing.Point(14, 357);
+            this.btSetAll.Location = new System.Drawing.Point(14, 375);
             this.btSetAll.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.btSetAll.Name = "btSetAll";
             this.btSetAll.Size = new System.Drawing.Size(160, 43);
@@ -2707,15 +2771,16 @@
             ((System.ComponentModel.ISupportInitialize)(this.comboPwr.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seqWidth.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seqChannel.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(xyDiagram2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(lineSeriesView2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(series2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(xyDiagram1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(lineSeriesView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(series1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartSrv)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.groupControl1)).EndInit();
             this.groupControl1.ResumeLayout(false);
             this.groupControl1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.spin5MM.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.spin6MM.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.spin7MM.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.spin1MM.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.spin2MM.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.spin3MM.Properties)).EndInit();
@@ -2771,11 +2836,15 @@
         private DevExpress.XtraEditors.LabelControl labelControl12;
         private DevExpress.XtraEditors.SpinEdit spin5MM;
         private DevExpress.XtraEditors.SpinEdit spin6MM;
+        private DevExpress.XtraEditors.SpinEdit spin7MM;
         private DevExpress.XtraEditors.LabelControl labelControl19;
         private DevExpress.XtraEditors.LabelControl labelControl20;
         private DevExpress.XtraEditors.LabelControl labelControl21;
         private DevExpress.XtraEditors.LabelControl labelControl23;
         private DevExpress.XtraEditors.LabelControl labelControl25;
+        private DevExpress.XtraEditors.LabelControl labelControl66;
+        private DevExpress.XtraEditors.LabelControl labelControl67;
+        private DevExpress.XtraEditors.LabelControl labelCur7;
         private DevExpress.XtraEditors.CheckEdit checkSrv8;
         private DevExpress.XtraEditors.CheckEdit checkSrv7;
         private DevExpress.XtraEditors.CheckEdit checkSrv6;

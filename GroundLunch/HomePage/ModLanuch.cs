@@ -1,4 +1,4 @@
-﻿using DevExpress.XtraEditors;
+using DevExpress.XtraEditors;
 using DevExpress.XtraScheduler.Native;
 using System;
 using System.Collections.Generic;

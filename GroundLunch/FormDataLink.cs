@@ -1,4 +1,4 @@
-﻿using DevExpress.XtraScheduler.Reporting;
+using DevExpress.XtraScheduler.Reporting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

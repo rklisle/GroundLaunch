@@ -1,4 +1,4 @@
-﻿using DevExpress.XtraGauges.Core.Base;
+using DevExpress.XtraGauges.Core.Base;
 using DevExpress.XtraGauges.Core.Drawing;
 using DevExpress.XtraGauges.Core.Model;
 using DevExpress.XtraGauges.Win.Base;

@@ -1,4 +1,4 @@
-﻿namespace GroundLunch
+namespace GroundLunch
 {
     partial class DataPlayBackPage
     {
@@ -89,7 +89,7 @@
             this.labelControl3.Name = "labelControl3";
             this.labelControl3.Size = new System.Drawing.Size(261, 41);
             this.labelControl3.TabIndex = 39;
-            this.labelControl3.Text = "PJ60-Y1巡飞器";
+            this.labelControl3.Text = "PJ150-Y1巡飞器";
             // 
             // chartSrv
             // 

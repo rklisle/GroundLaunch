@@ -1,4 +1,4 @@
-﻿using DevExpress.XtraCharts.Designer.Native;
+using DevExpress.XtraCharts.Designer.Native;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

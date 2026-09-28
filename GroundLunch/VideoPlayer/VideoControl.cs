@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -155,15 +155,9 @@ namespace GroundLunch
 
             if (AutoSendToFK)
             {
-                UInt16 x = Convert.ToUInt16(e.X);
-                UInt16 y = Convert.ToUInt16(e.Y);
-                UInt32 frameNo = 0;
-                byte[] sendData = new byte[8];
-                Buffer.BlockCopy(BitConverter.GetBytes(x), 0, sendData, 0, 2);
-                Buffer.BlockCopy(BitConverter.GetBytes(y), 0, sendData, 2, 2);
-                Buffer.BlockCopy(BitConverter.GetBytes(frameNo), 0, sendData, 4, 4);
-                NetDataHandle.Send_To_TM(NetDataHandle.curPao, NetDataHandle.curGuan,
-                    8, 0xD3, sendData);
+                var form = FindForm() as VideoForm;
+                if (form != null)
+                    form.SendLockTarget(Convert.ToUInt16(e.X), Convert.ToUInt16(e.Y));
             }
         }
     }

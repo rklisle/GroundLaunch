@@ -1,4 +1,4 @@
-﻿
+
 namespace GroundLunch
 {
     partial class VideoControl
